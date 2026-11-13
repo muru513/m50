@@ -41,6 +41,8 @@ export interface ItinerarySection {
     accent: string;
     border: string;
     scrim: string;
+    /** Optional shadow for pages whose video stays bright behind the text */
+    textShadow?: string;
   };
   calendar: CalendarEvent;
 }
@@ -65,14 +67,16 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     image: '/assets/aistudio/stay_seamless_poster.jpg',
     video: '/assets/aistudio/stay_seamless_loop.mp4',
     mood: {
-      // Mediterranean olive & botanical sage: ties into the palms and terrace, distinct from Friday's blue
-      bg: '#121D16',
-      surface: 'rgba(18, 29, 22, 0.86)',
-      text: '#F4F7F2',
-      muted: '#B9CBBF',
-      accent: '#8EC49D',
-      border: 'rgba(244, 247, 242, 0.16)',
-      scrim: 'linear-gradient(to top, rgba(14,23,17,0.96) 0%, rgba(14,23,17,0.76) 52%, rgba(14,23,17,0.22) 100%)',
+      // Mediterranean olive & botanical sage, with a light veil so the sunny pool video shows through
+      bg: '#16241B',
+      surface: 'rgba(22, 36, 27, 0.72)',
+      text: '#F7FAF5',
+      muted: '#D2E0D6',
+      accent: '#9FD8AE',
+      border: 'rgba(247, 250, 245, 0.2)',
+      scrim: 'linear-gradient(to top, rgba(14,28,19,0.88) 0%, rgba(14,28,19,0.5) 52%, rgba(14,28,19,0.06) 100%)',
+      // The lighter veil leaves bright sky behind the heading, so lift the text off it
+      textShadow: '0 1px 2px rgba(10, 22, 14, 0.45), 0 0 18px rgba(10, 22, 14, 0.35)',
     },
     calendar: {
       title: 'M 50 — Weekend Stay at THB Los Molinos',
