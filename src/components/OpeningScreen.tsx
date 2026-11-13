@@ -156,7 +156,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
             className="relative z-10 w-12 h-px bg-[#D4AF37] mx-auto mb-6 short:mb-3 origin-center"
           />
 
-          {/* May 20–22, 2027 and IBIZA, SPAIN (in the same slow speed as M 50) */}
+          {/* May 20–23, 2027 and IBIZA, SPAIN (in the same slow speed as M 50) */}
           <div className="relative z-10">
             <motion.p
               initial={instant ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.85, y: 10 }}
@@ -164,7 +164,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
               transition={{ duration: instant ? 0 : 1.2, delay: instant ? 0 : 5.4, ease: [0.16, 1, 0.3, 1] }}
               className="font-display italic text-xl sm:text-2xl short:text-lg text-[#E8DEC8] mb-2 short:mb-1"
             >
-              May 20–22, 2027
+              May 20–23, 2027
             </motion.p>
             <motion.p
               initial={instant ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.85, y: 8 }}
