@@ -1,12 +1,32 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Banknote, CalendarPlus, Check, Clock, ExternalLink, MapPin, Shirt, Utensils } from 'lucide-react';
+import { Banknote, CalendarPlus, Check, Clock, ExternalLink, MapPin, Shirt, Utensils, type LucideIcon } from 'lucide-react';
 import { ITINERARY_SECTIONS, SectionId } from './data/itinerary';
 import { downloadICS } from './utils/calendar';
 import { OpeningScreen } from './components/OpeningScreen';
 
 const VALID_SHORTCUT_DAYS: SectionId[] = ['stay', 'thu', 'fri', 'sat'];
 const LUXURY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+interface DetailRowProps {
+  icon: LucideIcon;
+  label: string;
+  color: string;
+  children: React.ReactNode;
+}
+
+// One line of event details: a decorative icon, a screen-reader label, and the value
+function DetailRow({ icon: Icon, label, color, children }: DetailRowProps) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="flex items-center mt-0.5" style={{ color }} title={label} aria-hidden="true">
+        <Icon className="w-4 h-4 shrink-0" />
+      </span>
+      <span className="sr-only">{label}: </span>
+      {children}
+    </div>
+  );
+}
 
 function getInitialUrlShortcut(): { entered: boolean; day: SectionId } {
   try {
@@ -32,7 +52,13 @@ export function App() {
     ...VALID_SHORTCUT_DAYS.filter((id) => id !== initialShortcut.day),
     initialShortcut.day,
   ]);
-  const [lingeringIds, setLingeringIds] = useState<SectionId[]>([]);
+  const [lingeringIds, setLingeringIdsState] = useState<SectionId[]>([]);
+  // Mirror of lingeringIds so event handlers can read the latest value without side effects in state updaters
+  const lingeringIdsRef = useRef<SectionId[]>([]);
+  const setLingeringIds = useCallback((next: SectionId[]) => {
+    lingeringIdsRef.current = next;
+    setLingeringIdsState(next);
+  }, []);
   const [addedCalendarId, setAddedCalendarId] = useState<SectionId | null>(null);
 
   const touchStartX = useRef<number | null>(null);
@@ -101,32 +127,32 @@ export function App() {
         delete lingerTimers.current[nextId];
       }
 
-      setLingeringIds((prev) => {
-        const isReversingMidFade = prev.includes(nextId);
-        if (isReversingMidFade) {
-          // nextId is already at opacity 1 directly underneath currentId;
-          // let currentId fade smoothly back to 0 on top without z-order pop
-          return prev.filter((id) => id !== nextId);
-        }
-
-        // Standard cross-dissolve: move nextId to top of stack and hold currentId
-        // at opacity 1 underneath until nextId finishes fading to 100%
+      const lingering = lingeringIdsRef.current;
+      if (lingering.includes(nextId)) {
+        // Reversing mid-fade: nextId is still at opacity 1 directly underneath currentId,
+        // so just let currentId fade back to 0 on top without a z-order pop
+        setLingeringIds(lingering.filter((id) => id !== nextId));
+      } else {
+        // Standard cross-dissolve: move nextId to the top of the stack and hold currentId
+        // at opacity 1 underneath until nextId finishes fading in
         setLayerOrder((order) => [...order.filter((id) => id !== nextId), nextId]);
 
         if (lingerTimers.current[currentId]) {
           window.clearTimeout(lingerTimers.current[currentId]);
         }
         lingerTimers.current[currentId] = window.setTimeout(() => {
-          setLingeringIds((l) => l.filter((id) => id !== currentId));
+          setLingeringIds(lingeringIdsRef.current.filter((id) => id !== currentId));
           delete lingerTimers.current[currentId];
         }, 650);
 
-        return prev.includes(currentId) ? prev : [...prev, currentId];
-      });
+        if (!lingering.includes(currentId)) {
+          setLingeringIds([...lingering, currentId]);
+        }
+      }
 
       setActiveId(nextId);
     },
-    []
+    [setLingeringIds]
   );
 
   useEffect(() => {
@@ -196,6 +222,7 @@ export function App() {
       {/* Pre-warmed Main Itinerary Shell */}
       <div
         aria-hidden={!entered}
+        inert={!entered}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className={`relative min-h-[100dvh] w-full flex flex-col justify-between overflow-x-hidden ${
@@ -230,7 +257,9 @@ export function App() {
                     playsInline
                     muted
                     loop
-                    preload="auto"
+                    // Only the visible day buffers fully; others fetch metadata and show their poster
+                    // until selected, which keeps the first load light on mobile data
+                    preload={item.id === activeId ? 'auto' : 'metadata'}
                     poster={item.image}
                     className={`h-full w-full object-cover ${
                       item.id === 'stay' ? 'object-[8%_center] sm:object-center' : 'object-center'
@@ -339,67 +368,33 @@ export function App() {
                 <div className="lg:col-span-5 flex flex-col gap-4">
                   <div className="flex flex-col gap-3.5 text-sm">
                     {section.time && (
-                      <div className="flex items-start gap-3">
-                        <span
-                          className="flex items-center mt-0.5"
-                          style={{ color: section.mood.muted }}
-                          aria-label="Time"
-                          title="Time"
-                        >
-                          <Clock className="w-4 h-4 shrink-0" />
-                        </span>
+                      <DetailRow icon={Clock} label="Time" color={section.mood.muted}>
                         <span className="font-medium text-left tabular-nums whitespace-pre-line leading-snug">
                           {section.time}
                         </span>
-                      </div>
+                      </DetailRow>
                     )}
 
                     {section.dressCode && (
-                      <div className="flex items-start gap-3">
-                        <span
-                          className="flex items-center mt-0.5"
-                          style={{ color: section.mood.muted }}
-                          aria-label="Dress Code"
-                          title="Dress Code"
-                        >
-                          <Shirt className="w-4 h-4 shrink-0" />
-                        </span>
-                        <span className="font-medium text-left leading-snug">
-                          {section.dressCode}
-                        </span>
-                      </div>
+                      <DetailRow icon={Shirt} label="Dress code" color={section.mood.muted}>
+                        <span className="font-medium text-left leading-snug">{section.dressCode}</span>
+                      </DetailRow>
                     )}
 
                     {section.note && (
-                      <div className="flex items-start gap-3">
-                        <span
-                          className="flex items-center mt-0.5"
-                          style={{ color: section.mood.muted }}
-                          aria-label="Details"
-                          title="Details"
-                        >
-                          {section.id === 'thu' ? (
-                            <Utensils className="w-4 h-4 shrink-0" />
-                          ) : (
-                            <Banknote className="w-4 h-4 shrink-0" />
-                          )}
-                        </span>
+                      <DetailRow
+                        icon={section.noteIcon === 'meal' ? Utensils : Banknote}
+                        label={section.noteIcon === 'meal' ? 'Dining' : 'Cost'}
+                        color={section.mood.muted}
+                      >
                         <span className="font-medium text-left whitespace-pre-line leading-snug">
                           {section.note}
                         </span>
-                      </div>
+                      </DetailRow>
                     )}
 
                     {section.googleMapsUrl && (
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="flex items-center"
-                          style={{ color: section.mood.muted }}
-                          aria-label="Location"
-                          title="Location"
-                        >
-                          <MapPin className="w-4 h-4 shrink-0" />
-                        </span>
+                      <DetailRow icon={MapPin} label="Location" color={section.mood.muted}>
                         <a
                           href={section.googleMapsUrl}
                           target="_blank"
@@ -410,9 +405,14 @@ export function App() {
                           <span>
                             {section.venue} · {section.venueArea}
                           </span>
-                          <ExternalLink className="w-3.5 h-3.5 shrink-0" style={{ color: section.mood.accent }} />
+                          <ExternalLink
+                            aria-hidden="true"
+                            className="w-3.5 h-3.5 shrink-0"
+                            style={{ color: section.mood.accent }}
+                          />
+                          <span className="sr-only">(opens Google Maps in a new tab)</span>
                         </a>
-                      </div>
+                      </DetailRow>
                     )}
 
                     {/* Add to Calendar as another line after maps */}
@@ -424,8 +424,7 @@ export function App() {
                       <span
                         className="flex items-center"
                         style={{ color: section.mood.muted }}
-                        aria-label="Add to Calendar"
-                        title="Add to Calendar"
+                        aria-hidden="true"
                       >
                         {addedCalendarId === section.id ? (
                           <Check className="w-4 h-4 shrink-0" style={{ color: section.mood.accent }} />
@@ -434,6 +433,7 @@ export function App() {
                         )}
                       </span>
                       <span
+                        aria-live="polite"
                         className="font-medium text-left hover:underline underline-offset-4 decoration-1 hover:opacity-80 transition-opacity"
                         style={{ color: section.mood.text }}
                       >

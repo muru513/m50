@@ -18,7 +18,13 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
     const timer = window.setTimeout(() => {
       setRevealed(true);
     }, 10000);
-    return () => window.clearTimeout(timer);
+    // Any key press completes the reveal, matching tap-anywhere for keyboard users
+    const handleKeyDown = () => setRevealed(true);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [revealed]);
 
   // Tap anywhere during the reveal to immediately complete
@@ -174,10 +180,13 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
         initial={instant ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: instant ? 0 : 0.85, delay: instant ? 0 : 9.0, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 flex items-center justify-end pb-safe w-full"
+        className={`relative z-10 flex items-center justify-end pb-safe w-full ${instant ? '' : 'pointer-events-none'}`}
       >
+        {/* Not clickable or focusable until it has faded in; a tap anywhere first completes the reveal */}
         <button
           type="button"
+          tabIndex={instant ? 0 : -1}
+          aria-hidden={!instant}
           onClick={(e) => {
             e.stopPropagation();
             onEnter();
