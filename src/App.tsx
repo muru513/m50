@@ -330,7 +330,7 @@ export function App() {
                   duration: transitionDuration,
                   ease: LUXURY_EASE,
                 }}
-                style={{ color: section.mood.text }}
+                style={{ color: section.mood.text, textShadow: section.mood.textShadow }}
                 className="col-start-1 row-start-1 grid grid-cols-1 lg:grid-cols-12 short:grid-cols-12 gap-8 lg:gap-12 short:gap-x-10 short:gap-y-4 items-start w-full will-change-[opacity,transform]"
               >
                 {/* Left: Editorial Headline & Description */}
