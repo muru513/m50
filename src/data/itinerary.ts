@@ -8,6 +8,12 @@ export interface CalendarEvent {
   description: string;
 }
 
+export interface ScheduleStop {
+  time: string;
+  title: string;
+  detail: string;
+}
+
 export interface ItinerarySection {
   id: SectionId;
   tabLabel: string;
@@ -23,6 +29,8 @@ export interface ItinerarySection {
   /** Icon shown beside the note: a fork & knife for meals, a banknote for prices */
   noteIcon: 'meal' | 'price';
   description: string;
+  /** Optional run-of-day timeline, shown under the details */
+  schedule?: ScheduleStop[];
   image: string;
   video?: string;
   mood: {
@@ -111,16 +119,23 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     id: 'fri',
     tabLabel: 'Fri 21',
     kicker: 'Friday, May 21',
-    title: 'Boat Day & Beach Lunch',
+    title: 'Yacht Day + Beach Lunch',
     venue: 'Beso Beach',
     venueArea: 'Formentera',
     googleMapsUrl: 'https://maps.google.com/?q=Beso+Beach+Formentera',
-    time: 'Boarding 10:00 am',
+    time: 'Hotel pickup 10:30 am\nBack by 6:45 pm',
     dressCode: 'Riviera Chic',
     note: '$500 per person (Yacht $350, Lunch $150)',
     noteIcon: 'price',
     description:
-      'Hop on the yacht, swim off the back, then land at Beso Beach for a long, sandy-toed lunch.',
+      'A private yacht to Formentera: champagne on deck, swimming and paddleboarding in clear water, and a barefoot lunch on the sand at Beso Beach.',
+    schedule: [
+      { time: '10:30', title: 'Transfer', detail: 'Private minibus from the hotel to Marina Botafoch' },
+      { time: '11:00', title: 'Set sail', detail: "Champagne welcome, then swim & paddleboard at S'Espalmador" },
+      { time: '1:30', title: 'Beso Beach lunch', detail: 'Tender to the sand for paella, cava sangria & music' },
+      { time: '4:00', title: 'Golden-hour cruise', detail: 'Rosé past the coves of Formentera' },
+      { time: '6:30', title: 'Return', detail: 'Dock at Botafoch; minibus back to the hotel by 6:45' },
+    ],
     image: '/assets/aistudio/yacht_seamless_poster.jpg',
     video: '/assets/aistudio/yacht_seamless_loop.mp4',
     mood: {
@@ -133,11 +148,12 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       scrim: 'linear-gradient(to top, rgba(6,34,52,0.96) 0%, rgba(6,34,52,0.74) 52%, rgba(6,34,52,0.22) 100%)',
     },
     calendar: {
-      title: 'M 50 — Boat Day + Lunch at Beso Beach',
-      start: '20270521T100000',
-      end: '20270521T180000',
-      location: 'Beso Beach, Formentera',
-      description: 'Yacht boarding at 10:00 am, swim off the back, and lunch at Beso Beach. Dress code: Riviera Chic. $500 per person.',
+      title: 'M 50 — Yacht Day + Beach Lunch',
+      start: '20270521T103000',
+      end: '20270521T184500',
+      location: 'Pickup at THB Los Molinos, Ibiza Town (yacht departs Marina Botafoch)',
+      description:
+        'Private yacht day to Formentera.\n10:30 Minibus from the hotel to Marina Botafoch\n11:00 Set sail: champagne, swimming & paddleboarding at S\'Espalmador\n1:30 Tender to Beso Beach for lunch on the sand\n4:00 Golden-hour cruise along the Formentera coast\n6:30 Dock at Botafoch; minibus back to the hotel by 6:45\nDress code: Riviera Chic. $500 per person.',
     },
   },
   {
