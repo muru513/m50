@@ -128,7 +128,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     note: '$500 per person (Yacht $350, Lunch $150)',
     noteIcon: 'price',
     description:
-      'Sun, sea and sangria aboard our private yacht, cruising the turquoise waters of Formentera and Ibiza. Dock for lunch at Beso Beach Club, then sail back at golden hour.',
+      'Sun, sea, and sangria aboard our private yacht, cruising the turquoise waters of Formentera or Ibiza, dropping anchor at a barefoot-chic beach club for a Spanish-style siesta lunch.',
     image: '/assets/aistudio/yacht_seamless_poster.jpg',
     video: '/assets/aistudio/yacht_seamless_loop.mp4',
     mood: {
