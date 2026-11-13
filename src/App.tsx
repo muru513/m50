@@ -415,7 +415,7 @@ export function App() {
                             className="w-3.5 h-3.5 shrink-0"
                             style={{ color: section.mood.accent }}
                           />
-                          <span className="sr-only">(opens Google Maps in a new tab)</span>
+                          <span className="sr-only">(opens in a new tab)</span>
                         </a>
                       </DetailRow>
                     )}
