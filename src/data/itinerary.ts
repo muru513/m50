@@ -65,13 +65,14 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     image: '/assets/aistudio/stay_seamless_poster.jpg',
     video: '/assets/aistudio/stay_seamless_loop.mp4',
     mood: {
-      bg: '#0F1A24',
-      surface: 'rgba(15, 26, 36, 0.86)',
-      text: '#F2FAFF',
-      muted: '#B0CFE0',
-      accent: '#67BAE8',
-      border: 'rgba(242, 250, 255, 0.16)',
-      scrim: 'linear-gradient(to top, rgba(11,20,28,0.96) 0%, rgba(11,20,28,0.76) 52%, rgba(11,20,28,0.22) 100%)',
+      // Mediterranean olive & botanical sage: ties into the palms and terrace, distinct from Friday's blue
+      bg: '#121D16',
+      surface: 'rgba(18, 29, 22, 0.86)',
+      text: '#F4F7F2',
+      muted: '#B9CBBF',
+      accent: '#8EC49D',
+      border: 'rgba(244, 247, 242, 0.16)',
+      scrim: 'linear-gradient(to top, rgba(14,23,17,0.96) 0%, rgba(14,23,17,0.76) 52%, rgba(14,23,17,0.22) 100%)',
     },
     calendar: {
       title: 'M 50 — Weekend Stay at THB Los Molinos',
