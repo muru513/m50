@@ -31,3 +31,44 @@
 .pt-safe {
   padding-top: env(safe-area-inset-top, 0px);
 }
+
+/* Landscape phones: viewport too short for the portrait layout */
+@custom-variant short (@media (max-height: 500px));
+
+/* Keep content clear of the notch / Dynamic Island when an iPhone is held sideways */
+.px-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Cover padding that also respects the side safe areas */
+.cover-pad {
+  padding: 1.5rem max(1.5rem, env(safe-area-inset-right, 0px)) 1.5rem max(1.5rem, env(safe-area-inset-left, 0px));
+}
+@media (min-width: 640px) {
+  .cover-pad {
+    padding: 2.5rem max(2.5rem, env(safe-area-inset-right, 0px)) 2.5rem max(2.5rem, env(safe-area-inset-left, 0px));
+  }
+}
+@media (max-height: 500px) {
+  .cover-pad {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+}
+
+@layer base {
+  html {
+    /* No grey flash on tap in iOS Safari */
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Background videos are decorative: never show iOS's play button (e.g. in Low Power Mode) */
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+video::-webkit-media-controls {
+  display: none !important;
+}
