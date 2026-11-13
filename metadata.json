@@ -2,7 +2,5 @@
   "name": "M50 Ibiza",
   "description": "A luxurious, interactive mobile invitation celebrating fifty years with curated Mediterranean experiences across a bespoke three-day journey.",
   "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "majorCapabilities": []
 }

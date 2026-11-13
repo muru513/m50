@@ -57,7 +57,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
           muted
           loop
           preload="auto"
-          poster="/src/assets/images/ibiza_thu_beachouse_1794418986663.jpg"
+          poster="/assets/opening_poster.jpg"
           className="h-full w-full object-cover object-center"
         >
           <source src="/assets/aistudio/download__1__b345d7cb.mp4" type="video/mp4" />

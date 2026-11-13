@@ -277,7 +277,7 @@ export function App() {
 
         {/* Main Content — Overlapping Single-Cell Grid Cross-Dissolve */}
         <main className="relative z-10 flex-1 flex flex-col justify-start px-5 sm:px-8 lg:px-14 pb-24 pt-12 max-w-6xl w-full mx-auto">
-          <div className="grid grid-cols-1 items-end w-full">
+          <div className="grid grid-cols-1 items-start w-full">
             <AnimatePresence initial={false}>
               <motion.article
                 key={section.id}
@@ -297,7 +297,7 @@ export function App() {
                   ease: LUXURY_EASE,
                 }}
                 style={{ color: section.mood.text }}
-                className="col-start-1 row-start-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end w-full will-change-[opacity,transform]"
+                className="col-start-1 row-start-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start w-full will-change-[opacity,transform]"
               >
                 {/* Left: Editorial Headline & Description */}
                 <div className="lg:col-span-7 flex flex-col gap-3">
