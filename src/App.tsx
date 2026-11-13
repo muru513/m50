@@ -61,7 +61,7 @@ export function App() {
   }, []);
   const [addedCalendarId, setAddedCalendarId] = useState<SectionId | null>(null);
 
-  const touchStartX = useRef<number | null>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const videoRefs = useRef<Partial<Record<SectionId, HTMLVideoElement | null>>>({});
   const lingerTimers = useRef<Partial<Record<SectionId, number>>>({});
   const pauseTimers = useRef<Partial<Record<SectionId, number>>>({});
@@ -115,6 +115,9 @@ export function App() {
     (nextId: SectionId) => {
       const currentId = activeIdRef.current;
       if (nextId === currentId) return;
+
+      // Each day starts at the top, even if the previous one was scrolled
+      if (window.scrollY > 0) window.scrollTo({ top: 0 });
 
       // Immediately start decoding/playing the incoming video before paint
       const incomingVideo = videoRefs.current[nextId];
@@ -172,15 +175,17 @@ export function App() {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!entered) return;
-    touchStartX.current = e.touches[0].clientX;
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!entered || touchStartX.current === null) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    touchStartX.current = null;
+    if (!entered || touchStart.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStart.current.x;
+    const deltaY = e.changedTouches[0].clientY - touchStart.current.y;
+    touchStart.current = null;
 
-    if (Math.abs(deltaX) < 55) return;
+    // Only clearly horizontal swipes change day, so a diagonal scroll doesn't
+    if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.5) return;
     if (deltaX < 0 && activeIndex < ITINERARY_SECTIONS.length - 1) {
       selectSection(ITINERARY_SECTIONS[activeIndex + 1].id);
     } else if (deltaX > 0 && activeIndex > 0) {
@@ -225,7 +230,7 @@ export function App() {
         inert={!entered}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`relative min-h-[100dvh] w-full flex flex-col justify-between overflow-x-hidden ${
+        className={`relative min-h-[100dvh] w-full flex flex-col justify-between overflow-x-hidden px-safe ${
           !entered ? 'pointer-events-none select-none' : ''
         }`}
       >
@@ -305,7 +310,7 @@ export function App() {
         </header>
 
         {/* Main Content — Overlapping Single-Cell Grid Cross-Dissolve */}
-        <main className="relative z-10 flex-1 flex flex-col justify-start px-5 sm:px-8 lg:px-14 pb-24 pt-12 max-w-6xl w-full mx-auto">
+        <main className="relative z-10 flex-1 flex flex-col justify-start px-5 sm:px-8 lg:px-14 pb-24 pt-12 short:pt-2 max-w-6xl w-full mx-auto">
           <div className="grid grid-cols-1 items-start w-full">
             <AnimatePresence initial={false}>
               <motion.article
@@ -326,10 +331,10 @@ export function App() {
                   ease: LUXURY_EASE,
                 }}
                 style={{ color: section.mood.text }}
-                className="col-start-1 row-start-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start w-full will-change-[opacity,transform]"
+                className="col-start-1 row-start-1 grid grid-cols-1 lg:grid-cols-12 short:grid-cols-12 gap-8 lg:gap-12 short:gap-x-10 short:gap-y-4 items-start w-full will-change-[opacity,transform]"
               >
                 {/* Left: Editorial Headline & Description */}
-                <div className="lg:col-span-7 flex flex-col gap-3">
+                <div className="lg:col-span-7 short:col-span-7 flex flex-col gap-3 short:gap-2">
                   <p
                     className="text-xs tracking-[0.16em] uppercase font-medium"
                     style={{ color: section.mood.accent }}
@@ -338,7 +343,7 @@ export function App() {
                   </p>
 
                   <h1
-                    className="font-display text-4xl sm:text-6xl font-normal leading-[1.05] tracking-tight"
+                    className="font-display text-4xl sm:text-6xl short:text-4xl font-normal leading-[1.05] tracking-tight"
                     style={{ textWrap: 'balance' }}
                   >
                     {section.eventUrl ? (
@@ -365,7 +370,7 @@ export function App() {
                 </div>
 
                 {/* Right: Unboxed Details & Calendar Action */}
-                <div className="lg:col-span-5 flex flex-col gap-4">
+                <div className="lg:col-span-5 short:col-span-5 flex flex-col gap-4">
                   <div className="flex flex-col gap-3.5 text-sm">
                     {section.time && (
                       <DetailRow icon={Clock} label="Time" color={section.mood.muted}>
@@ -399,7 +404,7 @@ export function App() {
                           href={section.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-medium text-left hover:underline underline-offset-4 decoration-1 hover:opacity-80 transition-opacity inline-flex items-center gap-1.5"
+                          className="font-medium text-left hover:underline underline-offset-4 decoration-1 hover:opacity-80 transition-opacity inline-flex items-center gap-1.5 relative before:absolute before:-inset-y-3 before:inset-x-0"
                           style={{ color: section.mood.text }}
                         >
                           <span>
@@ -419,7 +424,7 @@ export function App() {
                     <button
                       type="button"
                       onClick={() => handleAddToCalendar(section)}
-                      className="flex items-center gap-3 text-left cursor-pointer active:scale-95 transition-transform origin-left group py-0.5"
+                      className="flex items-center gap-3 text-left cursor-pointer active:scale-95 transition-transform origin-left group min-h-11 -my-2.5"
                     >
                       <span
                         className="flex items-center"
@@ -450,7 +455,7 @@ export function App() {
         {/* Fixed Bottom 4-Tab Navigation */}
         <nav
           aria-label="Weekend Itinerary"
-          className="fixed bottom-0 left-0 right-0 z-30 backdrop-blur-md pb-safe transition-[background-color,border-color] duration-500"
+          className="fixed bottom-0 left-0 right-0 z-30 backdrop-blur-md pb-safe px-safe transition-[background-color,border-color] duration-500"
           style={{
             backgroundColor: section.mood.surface,
             borderTop: `1px solid ${section.mood.border}`,
@@ -464,7 +469,7 @@ export function App() {
                   key={item.id}
                   type="button"
                   onClick={() => selectSection(item.id)}
-                  className="relative flex flex-col items-center justify-center min-h-[44px] text-xs font-medium tracking-wide transition-[color,transform] duration-500 active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
+                  className="relative flex flex-col items-center justify-center min-h-[44px] text-sm sm:text-xs font-medium tracking-wide transition-[color,transform] duration-500 active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                   style={{
                     color: isActive ? section.mood.accent : section.mood.muted,
                   }}

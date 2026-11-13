@@ -53,7 +53,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
       }}
       transition={{ duration: coverDuration, ease: LUXURY_EASE }}
       onClick={handleScreenTap}
-      className="fixed inset-0 z-50 h-[100dvh] w-full overflow-hidden bg-[#120F0C] text-[#F7F1E5] flex flex-col justify-between p-6 sm:p-10 select-none cursor-pointer will-change-[opacity,transform]"
+      className="fixed inset-0 z-50 h-[100dvh] w-full overflow-hidden bg-[#120F0C] text-[#F7F1E5] flex flex-col justify-between cover-pad select-none cursor-pointer will-change-[opacity,transform]"
     >
       {/* Live Video Background Loop */}
       <div className="absolute inset-0 z-0 overflow-hidden flex items-center justify-center pointer-events-none">
@@ -77,6 +77,9 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
         />
       </div>
 
+      {/* Keyed on `instant` so skipping the intro remounts these with their final state;
+          changing only `transition` would not cancel animations that are already scheduled */}
+      <React.Fragment key={instant ? 'shown' : 'intro'}>
       {/* Top: PRIVATE INVITATION only (glides in at 9.0s) */}
       <motion.div
         initial={instant ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
@@ -89,7 +92,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
 
       {/* Centerpiece Container with Gold Border Drawn From Top-Left */}
       <div className="relative z-10 my-auto flex flex-col items-center text-center max-w-lg mx-auto w-full">
-        <div className="relative px-8 py-10 sm:px-14 sm:py-14 w-full backdrop-blur-[1px]">
+        <div className="relative px-8 py-10 sm:px-14 sm:py-14 short:py-4 w-full backdrop-blur-[1px]">
           {/* Animated Gold Box drawn starting from top-left corner */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
@@ -116,7 +119,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
           </svg>
 
           {/* Heading: "M" zooms slowly at 1.2s, "50" settles alongside at 2.4s */}
-          <h1 className="relative z-10 font-display text-7xl sm:text-8xl font-normal tracking-tight text-[#FAF4E8] leading-none mb-3 flex items-center justify-center gap-4">
+          <h1 className="relative z-10 font-display text-7xl sm:text-8xl short:text-5xl font-normal tracking-tight text-[#FAF4E8] leading-none mb-3 short:mb-1.5 flex items-center justify-center gap-4">
             <motion.span
               initial={instant ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -140,7 +143,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
             initial={instant ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: instant ? 0 : 0.85, delay: instant ? 0 : 3.6, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 text-xs tracking-[0.26em] uppercase text-[#D4AF37] mb-5 font-medium"
+            className="relative z-10 text-xs tracking-[0.26em] uppercase text-[#D4AF37] mb-5 short:mb-2 font-medium"
           >
             est. 1977
           </motion.p>
@@ -150,7 +153,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
             initial={instant ? { scaleX: 1, opacity: 0.5 } : { scaleX: 0, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 0.5 }}
             transition={{ duration: instant ? 0 : 0.85, delay: instant ? 0 : 4.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 w-12 h-px bg-[#D4AF37] mx-auto mb-6 origin-center"
+            className="relative z-10 w-12 h-px bg-[#D4AF37] mx-auto mb-6 short:mb-3 origin-center"
           />
 
           {/* May 20–22, 2027 and IBIZA, SPAIN (in the same slow speed as M 50) */}
@@ -159,7 +162,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
               initial={instant ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.85, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: instant ? 0 : 1.2, delay: instant ? 0 : 5.4, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display italic text-xl sm:text-2xl text-[#E8DEC8] mb-2"
+              className="font-display italic text-xl sm:text-2xl short:text-lg text-[#E8DEC8] mb-2 short:mb-1"
             >
               May 20–22, 2027
             </motion.p>
@@ -197,6 +200,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
           <ArrowRight className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
         </button>
       </motion.div>
+      </React.Fragment>
     </motion.div>
   );
 };
