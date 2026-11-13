@@ -119,23 +119,16 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     id: 'fri',
     tabLabel: 'Fri 21',
     kicker: 'Friday, May 21',
-    title: 'Yacht Day + Beach Lunch',
+    title: 'Yacht Cruise & Beach Lunch',
     venue: 'Beso Beach',
     venueArea: 'Formentera',
     googleMapsUrl: 'https://maps.google.com/?q=Beso+Beach+Formentera',
-    time: 'Hotel pickup 10:30 am\nBack by 6:45 pm',
+    time: '10:30 am – 7:00 pm',
     dressCode: 'Riviera Chic',
     note: '$500 per person (Yacht $350, Lunch $150)',
     noteIcon: 'price',
     description:
-      'A private yacht to Formentera: champagne on deck, swimming and paddleboarding in clear water, and a barefoot lunch on the sand at Beso Beach.',
-    schedule: [
-      { time: '10:30', title: 'Transfer', detail: 'Private minibus from the hotel to Marina Botafoch' },
-      { time: '11:00', title: 'Set sail', detail: "Champagne welcome, then swim & paddleboard at S'Espalmador" },
-      { time: '1:30', title: 'Beso Beach lunch', detail: 'Tender to the sand for paella, cava sangria & music' },
-      { time: '4:00', title: 'Golden-hour cruise', detail: 'Rosé past the coves of Formentera' },
-      { time: '6:30', title: 'Return', detail: 'Dock at Botafoch; minibus back to the hotel by 6:45' },
-    ],
+      'Sun, sea and sangria aboard our private yacht, cruising the turquoise waters of Formentera and Ibiza. Dock for lunch at Beso Beach Club, right on the shores of Ses Salines Beach, then sail back at golden hour.',
     image: '/assets/aistudio/yacht_seamless_poster.jpg',
     video: '/assets/aistudio/yacht_seamless_loop.mp4',
     mood: {
@@ -148,12 +141,12 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       scrim: 'linear-gradient(to top, rgba(6,34,52,0.96) 0%, rgba(6,34,52,0.74) 52%, rgba(6,34,52,0.22) 100%)',
     },
     calendar: {
-      title: 'M 50 — Yacht Day + Beach Lunch',
+      title: 'M 50 — Yacht Cruise & Beach Lunch',
       start: '20270521T103000',
-      end: '20270521T184500',
-      location: 'Pickup at THB Los Molinos, Ibiza Town (yacht departs Marina Botafoch)',
+      end: '20270521T190000',
+      location: 'Beso Beach, Formentera',
       description:
-        'Private yacht day to Formentera.\n10:30 Minibus from the hotel to Marina Botafoch\n11:00 Set sail: champagne, swimming & paddleboarding at S\'Espalmador\n1:30 Tender to Beso Beach for lunch on the sand\n4:00 Golden-hour cruise along the Formentera coast\n6:30 Dock at Botafoch; minibus back to the hotel by 6:45\nDress code: Riviera Chic. $500 per person.',
+        'Private yacht cruise with lunch at Beso Beach, sailing back at golden hour. Dress code: Riviera Chic. $500 per person (Yacht $350, Lunch $150).',
     },
   },
   {
