@@ -408,14 +408,14 @@ export function App() {
                           style={{ color: section.mood.text }}
                         >
                           <span>
-                            {section.venue} · {section.venueArea}
+                            {section.venueArea ? `${section.venue} · ${section.venueArea}` : section.venue}
                           </span>
                           <ExternalLink
                             aria-hidden="true"
                             className="w-3.5 h-3.5 shrink-0"
                             style={{ color: section.mood.accent }}
                           />
-                          <span className="sr-only">(opens Google Maps in a new tab)</span>
+                          <span className="sr-only">(opens in a new tab)</span>
                         </a>
                       </DetailRow>
                     )}
@@ -446,6 +446,30 @@ export function App() {
                       </span>
                     </button>
                   </div>
+
+                  {section.schedule && (
+                    <section aria-label="The day" className="mt-3 short:mt-1">
+                      <h2
+                        className="text-xs tracking-[0.16em] uppercase font-medium mb-3"
+                        style={{ color: section.mood.accent }}
+                      >
+                        The Day
+                      </h2>
+                      <ol className="flex flex-col gap-2.5 text-sm">
+                        {section.schedule.map((stop) => (
+                          <li key={stop.time} className="grid grid-cols-[3rem_1fr] gap-x-3 leading-snug">
+                            <span className="tabular-nums font-medium" style={{ color: section.mood.accent }}>
+                              {stop.time}
+                            </span>
+                            <span>
+                              <span className="font-medium">{stop.title}</span>
+                              <span style={{ color: section.mood.muted }}> · {stop.detail}</span>
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
+                    </section>
+                  )}
                 </div>
               </motion.article>
             </AnimatePresence>

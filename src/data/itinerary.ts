@@ -8,6 +8,12 @@ export interface CalendarEvent {
   description: string;
 }
 
+export interface ScheduleStop {
+  time: string;
+  title: string;
+  detail: string;
+}
+
 export interface ItinerarySection {
   id: SectionId;
   tabLabel: string;
@@ -15,7 +21,7 @@ export interface ItinerarySection {
   title: string;
   eventUrl?: string;
   venue: string;
-  venueArea: string;
+  venueArea?: string;
   googleMapsUrl: string;
   time: string;
   dressCode: string;
@@ -23,6 +29,8 @@ export interface ItinerarySection {
   /** Icon shown beside the note: a fork & knife for meals, a banknote for prices */
   noteIcon: 'meal' | 'price';
   description: string;
+  /** Optional run-of-day timeline, shown under the details */
+  schedule?: ScheduleStop[];
   image: string;
   video?: string;
   mood: {
@@ -111,16 +119,16 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     id: 'fri',
     tabLabel: 'Fri 21',
     kicker: 'Friday, May 21',
-    title: 'Boat Day & Beach Lunch',
+    title: 'Yacht Cruise & Beach Lunch',
     venue: 'Beso Beach',
-    venueArea: 'Formentera',
-    googleMapsUrl: 'https://maps.google.com/?q=Beso+Beach+Formentera',
-    time: 'Boarding 10:00 am',
+    // Lunch spot not confirmed yet, so link to Beso Beach's site rather than one map pin
+    googleMapsUrl: 'https://besobeach.com/',
+    time: '10:30 am – 7:00 pm',
     dressCode: 'Riviera Chic',
     note: '$500 per person (Yacht $350, Lunch $150)',
     noteIcon: 'price',
     description:
-      'Hop on the yacht, swim off the back, then land at Beso Beach for a long, sandy-toed lunch.',
+      'Sun, sea and sangria aboard our private yacht, cruising the turquoise waters of Formentera and Ibiza. Dock for lunch at Beso Beach Club, then sail back at golden hour.',
     image: '/assets/aistudio/yacht_seamless_poster.jpg',
     video: '/assets/aistudio/yacht_seamless_loop.mp4',
     mood: {
@@ -133,11 +141,12 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       scrim: 'linear-gradient(to top, rgba(6,34,52,0.96) 0%, rgba(6,34,52,0.74) 52%, rgba(6,34,52,0.22) 100%)',
     },
     calendar: {
-      title: 'M 50 — Boat Day + Lunch at Beso Beach',
-      start: '20270521T100000',
-      end: '20270521T180000',
-      location: 'Beso Beach, Formentera',
-      description: 'Yacht boarding at 10:00 am, swim off the back, and lunch at Beso Beach. Dress code: Riviera Chic. $500 per person.',
+      title: 'M 50 — Yacht Cruise & Beach Lunch',
+      start: '20270521T103000',
+      end: '20270521T190000',
+      location: 'Beso Beach',
+      description:
+        'Private yacht cruise with lunch at Beso Beach, sailing back at golden hour. Dress code: Riviera Chic. $500 per person (Yacht $350, Lunch $150).',
     },
   },
   {
