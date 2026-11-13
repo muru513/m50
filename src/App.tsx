@@ -408,7 +408,7 @@ export function App() {
                           style={{ color: section.mood.text }}
                         >
                           <span>
-                            {section.venue} · {section.venueArea}
+                            {section.venueArea ? `${section.venue} · ${section.venueArea}` : section.venue}
                           </span>
                           <ExternalLink
                             aria-hidden="true"

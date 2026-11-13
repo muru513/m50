@@ -21,7 +21,7 @@ export interface ItinerarySection {
   title: string;
   eventUrl?: string;
   venue: string;
-  venueArea: string;
+  venueArea?: string;
   googleMapsUrl: string;
   time: string;
   dressCode: string;
@@ -121,7 +121,6 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     kicker: 'Friday, May 21',
     title: 'Yacht Cruise & Beach Lunch',
     venue: 'Beso Beach',
-    venueArea: 'Formentera or Ibiza (TBD)',
     // Lunch spot not confirmed yet, so link to Beso Beach's site rather than one map pin
     googleMapsUrl: 'https://besobeach.com/',
     time: '10:30 am – 7:00 pm',
@@ -145,7 +144,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       title: 'M 50 — Yacht Cruise & Beach Lunch',
       start: '20270521T103000',
       end: '20270521T190000',
-      location: 'Beso Beach, Formentera or Ibiza (TBD)',
+      location: 'Beso Beach',
       description:
         'Private yacht cruise with lunch at Beso Beach, sailing back at golden hour. Dress code: Riviera Chic. $500 per person (Yacht $350, Lunch $150).',
     },
