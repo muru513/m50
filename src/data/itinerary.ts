@@ -170,7 +170,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     note: '$250 per person',
     noteIcon: 'price',
     description:
-      'Raw timber, a botanical garden terrace, open-air fire pits, and mixology cocktails.',
+      "A secret garden oasis, Jul's pulses with raw, avant-garde energy, fusing open-fire grill cooking and bold mixology with deep, organic Afro-house beats that build as the night takes hold.",
     image: '/assets/aistudio/juls_seamless_poster.jpg',
     video: '/assets/aistudio/juls_seamless_loop.mp4',
     mood: {
@@ -187,7 +187,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       start: '20270522T193000',
       end: '20270523T010000',
       location: "Jul's, Sant Josep de sa Talaia, Ibiza",
-      description: "Botanical garden terrace, open-air fire pits, and mixology cocktails. Dress code: Unapologetically Bold Elegance. $250 per person.",
+      description: "A secret garden oasis, Jul's pulses with raw, avant-garde energy, fusing open-fire grill cooking and bold mixology with deep, organic Afro-house beats that build as the night takes hold. Dress code: Unapologetically Bold Elegance. $250 per person.",
     },
   },
 ];
