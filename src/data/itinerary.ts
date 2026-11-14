@@ -141,9 +141,11 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       surface: 'rgba(7, 42, 64, 0.84)',
       text: '#F2FAFF',
       muted: '#B5DDF2',
-      accent: '#38BDF8',
+      accent: '#7DD3FC',
       border: 'rgba(242, 250, 255, 0.18)',
-      scrim: 'linear-gradient(to top, rgba(6,34,52,0.96) 0%, rgba(6,34,52,0.74) 52%, rgba(6,34,52,0.22) 100%)',
+      // Extra veil behind the date and heading, which sit over the bright sky in the yacht video
+      scrim: 'linear-gradient(to top, rgba(6,34,52,0.96) 0%, rgba(6,34,52,0.74) 52%, rgba(6,34,52,0.78) 86%, rgba(6,34,52,0.42) 100%)',
+      textShadow: '0 1px 2px rgba(4, 22, 34, 0.6), 0 0 16px rgba(4, 22, 34, 0.5)',
     },
     calendar: {
       title: 'M 50 — Yacht Cruise & Beach Lunch',

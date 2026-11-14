@@ -336,7 +336,7 @@ export function App() {
                 {/* Left: Editorial Headline & Description */}
                 <div className="lg:col-span-7 short:col-span-7 flex flex-col gap-3 short:gap-2">
                   <p
-                    className="text-xs tracking-[0.16em] uppercase font-medium"
+                    className="text-[13px] tracking-[0.16em] uppercase font-medium"
                     style={{ color: section.mood.accent }}
                   >
                     {section.kicker}
@@ -362,7 +362,7 @@ export function App() {
                   </h1>
 
                   <p
-                    className="text-sm sm:text-base leading-relaxed max-w-xl mt-1"
+                    className="text-base sm:text-lg leading-[1.55] max-w-xl mt-1"
                     style={{ color: section.mood.muted }}
                   >
                     {section.description}
@@ -371,7 +371,7 @@ export function App() {
 
                 {/* Right: Unboxed Details & Calendar Action */}
                 <div className="lg:col-span-5 short:col-span-5 flex flex-col gap-4">
-                  <div className="flex flex-col gap-3.5 text-sm">
+                  <div className="flex flex-col gap-3.5 text-[15px] sm:text-base">
                     {section.time && (
                       <DetailRow icon={Clock} label="Time" color={section.mood.muted}>
                         <span className="font-medium text-left tabular-nums whitespace-pre-line leading-snug">
@@ -493,7 +493,7 @@ export function App() {
                   key={item.id}
                   type="button"
                   onClick={() => selectSection(item.id)}
-                  className="relative flex flex-col items-center justify-center min-h-[44px] text-sm sm:text-xs font-medium tracking-wide transition-[color,transform] duration-500 active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
+                  className="relative flex flex-col items-center justify-center min-h-[44px] text-[15px] sm:text-sm font-medium tracking-wide transition-[color,transform] duration-500 active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                   style={{
                     color: isActive ? section.mood.accent : section.mood.muted,
                   }}

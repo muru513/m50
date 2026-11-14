@@ -85,7 +85,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
         initial={instant ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: instant ? 0 : 0.85, delay: instant ? 0 : 9.0, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 flex items-center justify-start text-xs tracking-[0.2em] uppercase text-[#C8B99B] pt-safe pointer-events-none"
+        className="relative z-10 flex items-center justify-start text-[13px] tracking-[0.2em] uppercase text-[#C8B99B] pt-safe pointer-events-none"
       >
         <span>Private Invitation</span>
       </motion.div>
@@ -143,7 +143,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
             initial={instant ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: instant ? 0 : 0.85, delay: instant ? 0 : 3.6, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 text-xs tracking-[0.26em] uppercase text-[#D4AF37] mb-5 short:mb-2 font-medium"
+            className="relative z-10 text-[13px] tracking-[0.26em] uppercase text-[#D4AF37] mb-5 short:mb-2 font-medium"
           >
             est. 1977
           </motion.p>
@@ -162,7 +162,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
               initial={instant ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.85, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: instant ? 0 : 1.2, delay: instant ? 0 : 5.4, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display italic text-xl sm:text-2xl short:text-lg text-[#E8DEC8] mb-2 short:mb-1"
+              className="font-display italic text-[22px] sm:text-[26px] short:text-xl text-[#E8DEC8] mb-2 short:mb-1"
             >
               May 20–23, 2027
             </motion.p>
@@ -170,7 +170,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
               initial={instant ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.85, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: instant ? 0 : 1.2, delay: instant ? 0 : 6.4, ease: [0.16, 1, 0.3, 1] }}
-              className="text-sm tracking-[0.16em] uppercase text-[#D4AF37]"
+              className="text-[15px] tracking-[0.16em] uppercase text-[#D4AF37]"
             >
               Ibiza, Spain
             </motion.p>
@@ -194,7 +194,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
             e.stopPropagation();
             onEnter();
           }}
-          className="group min-h-[44px] inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-[#C8B99B] hover:text-[#FAF4E8] active:scale-95 transition-all origin-right cursor-pointer text-right"
+          className="group min-h-[44px] inline-flex items-center gap-2 text-[13px] tracking-[0.2em] uppercase text-[#C8B99B] hover:text-[#FAF4E8] active:scale-95 transition-all origin-right cursor-pointer text-right"
         >
           <span>Take me to Ibiza</span>
           <ArrowRight className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
