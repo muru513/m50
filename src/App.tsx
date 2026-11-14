@@ -267,7 +267,7 @@ export function App() {
                     preload={item.id === activeId ? 'auto' : 'metadata'}
                     poster={item.image}
                     className={`h-full w-full object-cover ${
-                      item.id === 'stay' ? 'object-[center_80%]' : 'object-center'
+                      item.id === 'stay' ? 'object-[8%_center] sm:object-center' : 'object-center'
                     }`}
                   >
                     <source src={item.video} type="video/mp4" />
@@ -278,7 +278,7 @@ export function App() {
                     alt={`${item.title} at ${item.venue}`}
                     referrerPolicy="no-referrer"
                     className={`h-full w-full object-cover ${
-                      item.id === 'stay' ? 'object-[center_80%]' : 'object-center'
+                      item.id === 'stay' ? 'object-[8%_center] sm:object-center' : 'object-center'
                     }`}
                   />
                 )}
