@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Banknote, CalendarPlus, Check, Clock, ExternalLink, MapPin, Shirt, Utensils, type LucideIcon } from 'lucide-react';
+import { Banknote, CalendarPlus, Check, Clock, ExternalLink, Globe, MapPin, Shirt, Utensils, type LucideIcon } from 'lucide-react';
 import { ITINERARY_SECTIONS, SectionId } from './data/itinerary';
 import { downloadICS } from './utils/calendar';
 import { OpeningScreen } from './components/OpeningScreen';
@@ -26,6 +26,15 @@ function DetailRow({ icon: Icon, label, color, children }: DetailRowProps) {
       {children}
     </div>
   );
+}
+
+// "https://www.thbhotels.com/en/..." -> "thbhotels.com"
+function displayDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
 }
 
 function getInitialUrlShortcut(): { entered: boolean; day: SectionId } {
@@ -346,19 +355,7 @@ export function App() {
                     className="font-display text-4xl sm:text-6xl short:text-4xl font-normal leading-[1.05] tracking-tight"
                     style={{ textWrap: 'balance' }}
                   >
-                    {section.eventUrl ? (
-                      <a
-                        href={section.eventUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:underline underline-offset-8 decoration-1 cursor-pointer transition-opacity hover:opacity-80"
-                        style={{ color: section.mood.text }}
-                      >
-                        {section.title}
-                      </a>
-                    ) : (
-                      section.title
-                    )}
+                    {section.title}
                   </h1>
 
                   <p
@@ -395,6 +392,26 @@ export function App() {
                         <span className="font-medium text-left whitespace-pre-line leading-snug">
                           {section.note}
                         </span>
+                      </DetailRow>
+                    )}
+
+                    {section.eventUrl && (
+                      <DetailRow icon={Globe} label="Website" color={section.mood.muted}>
+                        <a
+                          href={section.eventUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-left hover:underline underline-offset-4 decoration-1 hover:opacity-80 transition-opacity inline-flex items-center gap-1.5 relative before:absolute before:-inset-y-3 before:inset-x-0"
+                          style={{ color: section.mood.text }}
+                        >
+                          <span>{displayDomain(section.eventUrl)}</span>
+                          <ExternalLink
+                            aria-hidden="true"
+                            className="w-3.5 h-3.5 shrink-0"
+                            style={{ color: section.mood.accent }}
+                          />
+                          <span className="sr-only">(opens in a new tab)</span>
+                        </a>
                       </DetailRow>
                     )}
 
