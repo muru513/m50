@@ -64,8 +64,8 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     noteIcon: 'price',
     description:
       'Right on Figueretas beach in the heart of Ibiza Town, a 10-minute walk from historic Dalt Vila, with a pool on a landscaped seafront terrace — THB Los Molinos is our home base for the weekend.',
-    image: '/assets/aistudio/stay_seamless_poster.jpg',
-    video: '/assets/aistudio/stay_seamless_loop.mp4',
+    image: '/assets/aistudio/stay_thb_poster.jpg',
+    video: '/assets/aistudio/stay_thb_loop.mp4',
     mood: {
       // Mediterranean olive & botanical sage, with a light veil so the sunny pool video shows through
       bg: '#16241B',
