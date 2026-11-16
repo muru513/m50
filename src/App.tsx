@@ -326,7 +326,8 @@ export function App() {
                       if (activeIdRef.current === item.id) el.play().catch(() => {});
                     }}
                     className={`h-full w-full object-cover ${
-                      item.id === 'stay' ? 'object-[8%_center] sm:object-center' : 'object-center'
+                      // Portrait clip: anchor low so the pool stays in view on wide screens
+                      item.id === 'stay' ? 'object-[center_80%]' : 'object-center'
                     }`}
                   />
                 ) : (
@@ -335,7 +336,8 @@ export function App() {
                     alt={`${item.title} at ${item.venue}`}
                     referrerPolicy="no-referrer"
                     className={`h-full w-full object-cover ${
-                      item.id === 'stay' ? 'object-[8%_center] sm:object-center' : 'object-center'
+                      // Portrait clip: anchor low so the pool stays in view on wide screens
+                      item.id === 'stay' ? 'object-[center_80%]' : 'object-center'
                     }`}
                   />
                 )}
