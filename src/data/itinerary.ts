@@ -29,6 +29,8 @@ export interface ItinerarySection {
   /** Icon shown beside the note: a fork & knife for meals, a banknote for prices */
   noteIcon: 'meal' | 'price';
   description: string;
+  /** One line for the RSVP form's weekend overview */
+  rsvpSummary: string;
   /** Optional run-of-day timeline, shown under the details */
   schedule?: ScheduleStop[];
   image: string;
@@ -51,6 +53,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
   {
     id: 'stay',
     tabLabel: 'Stay',
+    rsvpSummary: 'Thu 20 – Sun 23 · 280 EUR / night',
     kicker: 'Home Base · May 20–23, 2027',
     title: 'THB Los Molinos',
     eventUrl: 'https://www.thbhotels.com/en/hotel-los-molinos-ibiza/',
@@ -91,6 +94,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
   {
     id: 'thu',
     tabLabel: 'Thu 20',
+    rsvpSummary: '7:00 pm · Hosted welcome dinner',
     kicker: 'Thursday, May 20',
     title: 'BOHO Experience at Beachouse',
     eventUrl: 'https://www.beachouseibiza.com/boho-experience',
@@ -125,6 +129,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
   {
     id: 'fri',
     tabLabel: 'Fri 21',
+    rsvpSummary: '10:30 am · $500 per person',
     kicker: 'Friday, May 21',
     title: 'Yacht Cruise & Beach Lunch',
     venue: 'Beso Beach',
@@ -159,6 +164,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
   {
     id: 'sat',
     tabLabel: 'Sat 22',
+    rsvpSummary: '7:30 pm · $250 per person',
     kicker: 'Saturday, May 22',
     title: "Dinner at Jul's",
     eventUrl: 'https://julsrestaurant.com/',

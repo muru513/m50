@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Banknote, CalendarPlus, Check, Clock, ExternalLink, Globe, MapPin, Shirt, Utensils, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Banknote, CalendarPlus, Check, Clock, ExternalLink, Globe, MapPin, Shirt, Utensils, type LucideIcon } from 'lucide-react';
 import { ITINERARY_SECTIONS, SectionId } from './data/itinerary';
 import { downloadICS } from './utils/calendar';
 import { OpeningScreen } from './components/OpeningScreen';
+import { RsvpSheet } from './components/RsvpSheet';
 
 const VALID_SHORTCUT_DAYS: SectionId[] = ['stay', 'thu', 'fri', 'sat'];
 const LUXURY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -69,6 +70,8 @@ export function App() {
     setLingeringIdsState(next);
   }, []);
   const [addedCalendarId, setAddedCalendarId] = useState<SectionId | null>(null);
+  const [rsvpOpen, setRsvpOpen] = useState(false);
+  const closeRsvp = useCallback(() => setRsvpOpen(false), []);
 
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const videoRefs = useRef<Partial<Record<SectionId, HTMLVideoElement | null>>>({});
@@ -169,6 +172,7 @@ export function App() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (rsvpOpen) return;
       if (e.key === 'Escape' && entered) {
         hasEnteredOnce.current = true;
         setEntered(false);
@@ -180,7 +184,7 @@ export function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [entered, activeIndex, selectSection]);
+  }, [entered, activeIndex, selectSection, rsvpOpen]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!entered) return;
@@ -368,7 +372,7 @@ export function App() {
 
                 {/* Right: Unboxed Details & Calendar Action */}
                 <div className="lg:col-span-5 short:col-span-5 flex flex-col gap-4">
-                  <div className="flex flex-col gap-3.5 text-[15px] sm:text-base">
+                  <div className="flex flex-col gap-2.5 text-[15px] sm:text-base">
                     {section.time && (
                       <DetailRow icon={Clock} label="Time" color={section.mood.muted}>
                         <span className="font-medium text-left tabular-nums whitespace-pre-line leading-snug">
@@ -502,7 +506,7 @@ export function App() {
             borderTop: `1px solid ${section.mood.border}`,
           }}
         >
-          <div className="max-w-xl mx-auto grid grid-cols-4 h-16">
+          <div className="max-w-xl mx-auto grid grid-cols-4 h-[46px]">
             {ITINERARY_SECTIONS.map((item) => {
               const isActive = item.id === activeId;
               return (
@@ -528,8 +532,24 @@ export function App() {
               );
             })}
           </div>
+
+          {/* One RSVP for the whole weekend: stays put while the days change */}
+          <div className="flex flex-col items-center pb-1">
+            <span aria-hidden="true" className="w-12 h-px bg-[#D4AF37] opacity-55 mt-0.5" />
+            <button
+              type="button"
+              onClick={() => setRsvpOpen(true)}
+              aria-haspopup="dialog"
+              className="group min-h-10 inline-flex items-center gap-2 text-[13px] tracking-[0.2em] uppercase text-[#D9C38A] hover:text-[#FAF4E8] active:scale-95 transition-all cursor-pointer"
+            >
+              <span>RSVP for the weekend</span>
+              <ArrowRight aria-hidden="true" className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+            </button>
+          </div>
         </nav>
       </div>
+
+      <AnimatePresence>{rsvpOpen && <RsvpSheet key="rsvp" onClose={closeRsvp} />}</AnimatePresence>
     </div>
   );
 }
