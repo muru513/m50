@@ -77,9 +77,8 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       muted: '#EEF5EF',
       accent: '#CDF6D7',
       border: 'rgba(247, 250, 245, 0.2)',
-      // Stronger olive veil only behind the kicker and description; the pool below gets a light, neutral
-      // blue-grey tint plus a soft blue wash over the water band, and the sky at the very top stays bright
-      scrim: 'linear-gradient(to top, rgba(40,130,190,0) 6%, rgba(40,130,190,0.26) 18%, rgba(40,130,190,0.16) 30%, rgba(40,130,190,0) 40%), linear-gradient(to top, rgba(10,20,26,0.72) 0%, rgba(10,20,26,0.22) 22%, rgba(10,22,24,0.3) 42%, rgba(14,28,19,0.68) 57%, rgba(14,28,19,0.66) 86%, rgba(14,28,19,0.3) 100%)',
+      // Lighter veil so the THB view reads clearly; extra depth only behind the date, heading and description
+      scrim: 'linear-gradient(to top, rgba(10,20,26,0.6) 0%, rgba(10,20,26,0.12) 20%, rgba(10,22,24,0.32) 40%, rgba(14,28,19,0.64) 55%, rgba(14,28,19,0.62) 86%, rgba(14,28,19,0.28) 100%)',
       // The lighter veil leaves bright sky behind the heading, so lift the text off it
       textShadow: '0 1px 2px rgba(10, 22, 14, 0.6), 0 0 16px rgba(10, 22, 14, 0.5)',
     },
