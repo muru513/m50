@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Banknote, CalendarPlus, Check, Clock, ExternalLink, Globe, MapPin, Shirt, Utensils, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Banknote, CalendarPlus, Check, Clock, ExternalLink, Globe, MapPin, Shirt, Utensils, type LucideIcon } from 'lucide-react';
 import { ITINERARY_SECTIONS, SectionId } from './data/itinerary';
 import { downloadICS } from './utils/calendar';
 import { OpeningScreen } from './components/OpeningScreen';
 
 const VALID_SHORTCUT_DAYS: SectionId[] = ['stay', 'thu', 'fri', 'sat'];
+// TODO: replace with the real RSVP destination (form, page or Google Form) before merging
+const RSVP_URL = '#rsvp';
 const LUXURY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface DetailRowProps {
@@ -368,7 +370,7 @@ export function App() {
 
                 {/* Right: Unboxed Details & Calendar Action */}
                 <div className="lg:col-span-5 short:col-span-5 flex flex-col gap-4">
-                  <div className="flex flex-col gap-3.5 text-[15px] sm:text-base">
+                  <div className="flex flex-col gap-2.5 text-[15px] sm:text-base">
                     {section.time && (
                       <DetailRow icon={Clock} label="Time" color={section.mood.muted}>
                         <span className="font-medium text-left tabular-nums whitespace-pre-line leading-snug">
@@ -502,7 +504,7 @@ export function App() {
             borderTop: `1px solid ${section.mood.border}`,
           }}
         >
-          <div className="max-w-xl mx-auto grid grid-cols-4 h-16">
+          <div className="max-w-xl mx-auto grid grid-cols-4 h-[46px]">
             {ITINERARY_SECTIONS.map((item) => {
               const isActive = item.id === activeId;
               return (
@@ -527,6 +529,20 @@ export function App() {
                 </button>
               );
             })}
+          </div>
+
+          {/* One RSVP for the whole weekend: stays put while the days change */}
+          <div className="flex flex-col items-center pb-1">
+            <span aria-hidden="true" className="w-12 h-px bg-[#D4AF37] opacity-55 mt-0.5" />
+            <a
+              href={RSVP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group min-h-10 inline-flex items-center gap-2 text-[13px] tracking-[0.2em] uppercase text-[#D9C38A] hover:text-[#FAF4E8] active:scale-95 transition-all"
+            >
+              <span>RSVP for the weekend</span>
+              <ArrowRight aria-hidden="true" className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+            </a>
           </div>
         </nav>
       </div>
