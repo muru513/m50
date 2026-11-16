@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight, Minus, Plus, X } from 'lucide-react';
 import { ITINERARY_SECTIONS } from '../data/itinerary';
 import { Attending, RSVP_GOOGLE_FORM, RSVP_REPLY_BY, submitRsvp } from '../data/rsvp';
 
@@ -15,11 +15,20 @@ const SAND = '#C8B99B';
 
 type Stage = 'form' | 'sending' | 'thanks' | 'error';
 
+const MAX_GUESTS = 4;
+
+// ['Daniel'] -> 'you and Daniel'; ['Daniel', 'Ana'] -> 'you, Daniel and Ana'
+function partyList(names: string[]): string {
+  const all = ['you', ...names];
+  return all.length === 1 ? 'you' : `${all.slice(0, -1).join(', ')} and ${all[all.length - 1]}`;
+}
+
 export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
   const shouldReduceMotion = useReducedMotion();
   const [name, setName] = useState('');
   const [attending, setAttending] = useState<Attending | null>(null);
-  const [guest, setGuest] = useState('');
+  const [guestCount, setGuestCount] = useState(1); // including the person replying
+  const [guestNames, setGuestNames] = useState<string[]>([]);
   const [stage, setStage] = useState<Stage>('form');
   const [saved, setSaved] = useState(true);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -39,9 +48,23 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
     };
   }, [onClose]);
 
-  const canSend = name.trim().length > 0 && attending !== null && stage !== 'sending';
-  const firstName = name.trim().split(/\s+/)[0] ?? '';
   const accepted = attending === 'Joyfully accepts';
+  // One name per extra guest; fields not yet typed in count as empty
+  const extraNames = Array.from({ length: guestCount - 1 }, (_, i) => (guestNames[i] ?? '').trim());
+  const guestsNamed = !accepted || extraNames.every((n) => n.length > 0);
+  const canSend = name.trim().length > 0 && attending !== null && guestsNamed && stage !== 'sending';
+  const firstName = name.trim().split(/\s+/)[0] ?? '';
+
+  const changeGuestCount = (delta: number) => {
+    setGuestCount((c) => Math.min(MAX_GUESTS, Math.max(1, c + delta)));
+  };
+  const setGuestName = (index: number, value: string) => {
+    setGuestNames((names) => {
+      const next = [...names];
+      next[index] = value;
+      return next;
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +74,8 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
       const wasSaved = await submitRsvp({
         name: name.trim(),
         attending,
-        guest: accepted ? guest.trim() : '',
+        guests: accepted ? guestCount : 0,
+        guestNames: accepted ? extraNames.join(', ') : '',
       });
       setSaved(wasSaved);
       setStage('thanks');
@@ -113,7 +137,7 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
             </p>
             <p className="text-[13.5px] leading-relaxed mb-6" style={{ color: SAND }}>
               {accepted
-                ? `We've noted ${guest.trim() ? `you and ${guest.trim()}` : 'you'} for May 20–23.`
+                ? `We've noted ${partyList(extraNames)} for May\u00a020–23.`
                 : 'Thank you for letting us know.'}
               <br />
               Plans change? Simply reply again.
@@ -139,12 +163,10 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
               M 50 · Ibiza · May 20–23, 2027
             </p>
             <h2 id="rsvp-title" className="font-display font-normal text-[32px] leading-[1.1] mb-1" style={{ color: INK }}>
-              Will you join us?
+              Celebrate with us
             </h2>
             <p className="text-[13px] leading-snug mb-3" style={{ color: SAND }}>
-              One reply for the whole weekend
-              <br />
-              Kindly reply by {RSVP_REPLY_BY}
+              Reply by {RSVP_REPLY_BY} for the weekend
             </p>
 
             {/* The weekend at a glance, so guests see every day and its cost before replying */}
@@ -209,18 +231,53 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
 
             {accepted && (
               <div className="mb-5">
-                <label htmlFor="rsvp-guest" className={labelClass} style={{ color: SAND }}>
-                  Bringing a guest? Their name
-                </label>
-                <input
-                  id="rsvp-guest"
-                  type="text"
-                  placeholder="Optional"
-                  value={guest}
-                  onChange={(e) => setGuest(e.target.value)}
-                  className={inputClass}
-                  style={{ color: INK }}
-                />
+                <div className="flex items-center justify-between mb-2">
+                  <span id="rsvp-guests-label" className={labelClass} style={{ color: SAND }}>
+                    Guests, including you
+                  </span>
+                  <div className="flex items-center" role="group" aria-labelledby="rsvp-guests-label">
+                    <button
+                      type="button"
+                      onClick={() => changeGuestCount(-1)}
+                      disabled={guestCount <= 1}
+                      aria-label="Fewer guests"
+                      className="w-11 h-11 flex items-center justify-center cursor-pointer disabled:opacity-30 disabled:cursor-default"
+                      style={{ color: SAND }}
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span aria-live="polite" className="w-6 text-center text-base tabular-nums" style={{ color: INK }}>
+                      {guestCount}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => changeGuestCount(1)}
+                      disabled={guestCount >= MAX_GUESTS}
+                      aria-label="More guests"
+                      className="w-11 h-11 flex items-center justify-center cursor-pointer disabled:opacity-30 disabled:cursor-default"
+                      style={{ color: SAND }}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                {Array.from({ length: guestCount - 1 }, (_, i) => (
+                  <div key={i} className="mb-3">
+                    <label htmlFor={`rsvp-guest-${i}`} className={labelClass} style={{ color: SAND }}>
+                      {guestCount > 2 ? `Guest ${i + 1}'s name` : "Your guest's name"}
+                    </label>
+                    <input
+                      id={`rsvp-guest-${i}`}
+                      type="text"
+                      placeholder="Full name"
+                      value={guestNames[i] ?? ''}
+                      onChange={(e) => setGuestName(i, e.target.value)}
+                      className={inputClass}
+                      style={{ color: INK }}
+                      required
+                    />
+                  </div>
+                ))}
               </div>
             )}
 
