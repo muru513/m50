@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
+import { useVideoUrl } from '../utils/videoBlob';
 
 interface OpeningScreenProps {
   onEnter: () => void;
   alreadyRevealed?: boolean;
 }
 
+const COVER_VIDEO = '/assets/aistudio/download__1__b345d7cb.mp4';
+
 const LUXURY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRevealed = false }) => {
   const [revealed, setRevealed] = useState(alreadyRevealed);
   const shouldReduceMotion = useReducedMotion();
+  // Downloaded in full before playing: the host can't stream video to iPhones (see utils/videoBlob)
+  const coverVideoUrl = useVideoUrl(COVER_VIDEO);
 
   useEffect(() => {
     if (revealed) return;
@@ -58,16 +63,16 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
       {/* Live Video Background Loop */}
       <div className="absolute inset-0 z-0 overflow-hidden flex items-center justify-center pointer-events-none">
         <video
+          src={coverVideoUrl}
           autoPlay
           playsInline
           muted
           loop
           preload="auto"
           poster="/assets/opening_poster.jpg"
+          onLoadedData={(e) => e.currentTarget.play().catch(() => {})}
           className="h-full w-full object-cover object-center"
-        >
-          <source src="/assets/aistudio/download__1__b345d7cb.mp4" type="video/mp4" />
-        </video>
+        />
         <div
           className="absolute inset-0"
           style={{

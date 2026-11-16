@@ -3,11 +3,40 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, Banknote, CalendarPlus, Check, Clock, ExternalLink, Globe, MapPin, Shirt, Utensils, type LucideIcon } from 'lucide-react';
 import { ITINERARY_SECTIONS, SectionId } from './data/itinerary';
 import { downloadICS } from './utils/calendar';
+import { loadVideo, useVideoUrl } from './utils/videoBlob';
 import { OpeningScreen } from './components/OpeningScreen';
 import { RsvpSheet } from './components/RsvpSheet';
 
 const VALID_SHORTCUT_DAYS: SectionId[] = ['stay', 'thu', 'fri', 'sat'];
 const LUXURY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+interface DayVideoProps {
+  src: string;
+  poster: string;
+  enabled: boolean;
+  className: string;
+  videoRef: (el: HTMLVideoElement | null) => void;
+  onReady: (el: HTMLVideoElement) => void;
+}
+
+// Background loop for one day. The poster shows until the whole file has downloaded
+// (see utils/videoBlob for why), then the video takes over.
+function DayVideo({ src, poster, enabled, className, videoRef, onReady }: DayVideoProps) {
+  const url = useVideoUrl(src, enabled);
+  return (
+    <video
+      ref={videoRef}
+      src={url}
+      poster={poster}
+      playsInline
+      muted
+      loop
+      preload="auto"
+      onLoadedData={(e) => onReady(e.currentTarget)}
+      className={className}
+    />
+  );
+}
 
 interface DetailRowProps {
   icon: LucideIcon;
@@ -71,6 +100,7 @@ export function App() {
   }, []);
   const [addedCalendarId, setAddedCalendarId] = useState<SectionId | null>(null);
   const [rsvpOpen, setRsvpOpen] = useState(false);
+  const [videoWanted, setVideoWanted] = useState<SectionId[]>([]);
   const closeRsvp = useCallback(() => setRsvpOpen(false), []);
 
   const touchStart = useRef<{ x: number; y: number } | null>(null);
@@ -84,6 +114,23 @@ export function App() {
   const section = ITINERARY_SECTIONS[activeIndex] ?? ITINERARY_SECTIONS[0];
 
   const transitionDuration = shouldReduceMotion ? 0.2 : 0.6;
+
+  // Download the visible day's video first, then its neighbours in the background
+  useEffect(() => {
+    setVideoWanted((w) => (w.includes(activeId) ? w : [...w, activeId]));
+    const active = ITINERARY_SECTIONS.find((s) => s.id === activeId);
+    if (!active?.video) return;
+    let cancelled = false;
+    loadVideo(active.video).then(() => {
+      if (cancelled) return;
+      const i = ITINERARY_SECTIONS.findIndex((s) => s.id === activeId);
+      const neighbours = [ITINERARY_SECTIONS[i - 1], ITINERARY_SECTIONS[i + 1]].filter(Boolean).map((s) => s.id);
+      setVideoWanted((w) => [...w, ...neighbours.filter((id) => !w.includes(id))]);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeId]);
 
   // Keep the active chapter's video warm & playing immediately, and pause hidden videos once cross-dissolved
   useEffect(() => {
@@ -267,24 +314,21 @@ export function App() {
                 className="absolute inset-0 overflow-hidden will-change-opacity"
               >
                 {item.video ? (
-                  <video
-                    ref={(el) => {
+                  <DayVideo
+                    src={item.video}
+                    poster={item.image}
+                    enabled={videoWanted.includes(item.id)}
+                    videoRef={(el) => {
                       videoRefs.current[item.id] = el;
                     }}
-                    autoPlay={item.id === initialShortcut.day}
-                    playsInline
-                    muted
-                    loop
-                    // Only the visible day buffers fully; others fetch metadata and show their poster
-                    // until selected, which keeps the first load light on mobile data
-                    preload={item.id === activeId ? 'auto' : 'metadata'}
-                    poster={item.image}
+                    onReady={(el) => {
+                      // Start as soon as the download finishes if this day is on screen
+                      if (activeIdRef.current === item.id) el.play().catch(() => {});
+                    }}
                     className={`h-full w-full object-cover ${
                       item.id === 'stay' ? 'object-[8%_center] sm:object-center' : 'object-center'
                     }`}
-                  >
-                    <source src={item.video} type="video/mp4" />
-                  </video>
+                  />
                 ) : (
                   <img
                     src={item.image}
