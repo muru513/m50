@@ -1,6 +1,6 @@
 // RSVP settings. One reply covers the whole weekend.
 
-export const RSVP_REPLY_BY = 'January 1';
+export const RSVP_REPLY_BY = 'Jan 1';
 
 /**
  * Google Form that receives replies (they land in its linked Google Sheet).

@@ -166,7 +166,7 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
               Celebrate with us
             </h2>
             <p className="text-[13px] leading-snug mb-3" style={{ color: SAND }}>
-              Reply by {RSVP_REPLY_BY} for the weekend
+              RSVP by {RSVP_REPLY_BY}
             </p>
 
             {/* The weekend at a glance, so guests see every day and its cost before replying */}
