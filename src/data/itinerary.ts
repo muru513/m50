@@ -35,6 +35,9 @@ export interface ItinerarySection {
   schedule?: ScheduleStop[];
   image: string;
   video?: string;
+  /** Optional landscape versions for wide screens (desktop, tablets held sideways) */
+  videoWide?: string;
+  imageWide?: string;
   mood: {
     bg: string;
     surface: string;
@@ -69,6 +72,8 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       'Right on Figueretas beach in the heart of Ibiza Town, a 10-minute walk from historic Dalt Vila, with a pool on a landscaped seafront terrace — THB Los Molinos is our home base for the weekend.',
     image: '/assets/aistudio/stay_poster.jpg',
     video: '/assets/aistudio/stay_loop.mp4',
+    videoWide: '/assets/aistudio/stay_loop_wide.mp4',
+    imageWide: '/assets/aistudio/stay_poster_wide.jpg',
     mood: {
       // Mediterranean olive & botanical sage, with a light veil so the sunny pool video shows through
       bg: '#16241B',
