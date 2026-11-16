@@ -21,6 +21,19 @@ interface DayVideoProps {
 
 // Background loop for one day. The poster shows until the whole file has downloaded
 // (see utils/videoBlob for why), then the video takes over.
+// Landscape screens (desktop, tablets sideways) get the wide version of a clip when one exists
+function useIsWideScreen(): boolean {
+  const query = '(min-aspect-ratio: 1/1)';
+  const [wide, setWide] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = () => setWide(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return wide;
+}
+
 function DayVideo({ src, poster, enabled, className, videoRef, onReady }: DayVideoProps) {
   const url = useVideoUrl(src, enabled);
   return (
@@ -101,6 +114,11 @@ export function App() {
   const [addedCalendarId, setAddedCalendarId] = useState<SectionId | null>(null);
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [videoWanted, setVideoWanted] = useState<SectionId[]>([]);
+  const isWide = useIsWideScreen();
+  const videoFor = useCallback(
+    (s: (typeof ITINERARY_SECTIONS)[number]) => (isWide && s.videoWide) || s.video,
+    [isWide]
+  );
   const closeRsvp = useCallback(() => setRsvpOpen(false), []);
 
   const touchStart = useRef<{ x: number; y: number } | null>(null);
@@ -121,7 +139,7 @@ export function App() {
     const active = ITINERARY_SECTIONS.find((s) => s.id === activeId);
     if (!active?.video) return;
     let cancelled = false;
-    loadVideo(active.video).then(() => {
+    loadVideo(videoFor(active)!).then(() => {
       if (cancelled) return;
       const i = ITINERARY_SECTIONS.findIndex((s) => s.id === activeId);
       const neighbours = [ITINERARY_SECTIONS[i - 1], ITINERARY_SECTIONS[i + 1]].filter(Boolean).map((s) => s.id);
@@ -130,7 +148,7 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, [activeId]);
+  }, [activeId, videoFor]);
 
   // Keep the active chapter's video warm & playing immediately, and pause hidden videos once cross-dissolved
   useEffect(() => {
@@ -315,8 +333,8 @@ export function App() {
               >
                 {item.video ? (
                   <DayVideo
-                    src={item.video}
-                    poster={item.image}
+                    src={videoFor(item)!}
+                    poster={(isWide && item.imageWide) || item.image}
                     enabled={videoWanted.includes(item.id)}
                     videoRef={(el) => {
                       videoRefs.current[item.id] = el;
@@ -326,8 +344,7 @@ export function App() {
                       if (activeIdRef.current === item.id) el.play().catch(() => {});
                     }}
                     className={`h-full w-full object-cover ${
-                      // Portrait clip: anchor low so the pool stays in view on wide screens
-                      item.id === 'stay' ? 'object-[center_80%]' : 'object-center'
+                      'object-center'
                     }`}
                   />
                 ) : (
@@ -336,8 +353,7 @@ export function App() {
                     alt={`${item.title} at ${item.venue}`}
                     referrerPolicy="no-referrer"
                     className={`h-full w-full object-cover ${
-                      // Portrait clip: anchor low so the pool stays in view on wide screens
-                      item.id === 'stay' ? 'object-[center_80%]' : 'object-center'
+                      'object-center'
                     }`}
                   />
                 )}
