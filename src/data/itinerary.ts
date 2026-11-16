@@ -107,8 +107,8 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     noteIcon: 'meal',
     description:
       'Curated by Camilo Franco, BOHO Experience is a boho-chic beach party with acoustic acts, downtempo house beats, sunset drinks, and starlit Mediterranean dining and dancing under the palms.',
-    image: '/assets/aistudio/beachouse_seamless_poster.jpg',
-    video: '/assets/aistudio/beachouse_seamless_loop.mp4',
+    image: '/assets/aistudio/thu_beachouse_poster.jpg',
+    video: '/assets/aistudio/thu_beachouse_loop.mp4',
     mood: {
       bg: '#23160E',
       surface: 'rgba(35, 22, 14, 0.86)',
