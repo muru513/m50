@@ -9,6 +9,7 @@ interface OpeningScreenProps {
 }
 
 const COVER_VIDEO = '/assets/aistudio/download__1__b345d7cb.mp4';
+const COVER_POSTER = '/assets/opening_poster.jpg';
 
 const LUXURY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -17,6 +18,16 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
   const shouldReduceMotion = useReducedMotion();
   // Downloaded in full before playing: the host can't stream video to iPhones (see utils/videoBlob)
   const coverVideoUrl = useVideoUrl(COVER_VIDEO);
+  // Start the background ease-in once the still image (the video's first frame) is ready
+  const [bgReady, setBgReady] = useState(alreadyRevealed);
+  useEffect(() => {
+    if (bgReady) return;
+    const img = new Image();
+    img.onload = () => setBgReady(true);
+    img.onerror = () => setBgReady(true);
+    img.src = COVER_POSTER;
+    if (img.complete) setBgReady(true);
+  }, [bgReady]);
 
   useEffect(() => {
     if (revealed) return;
@@ -60,6 +71,13 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
     >
       {/* Live Video Background Loop */}
       <div className="absolute inset-0 z-0 overflow-hidden flex items-center justify-center pointer-events-none">
+        {/* The picture eases in from darkness with a slow settle, rather than popping in when it arrives */}
+        <motion.div
+          className="absolute inset-0"
+          initial={alreadyRevealed ? false : { opacity: 0, scale: shouldReduceMotion ? 1 : 1.08 }}
+          animate={bgReady ? { opacity: 1, scale: 1 } : { opacity: 0, scale: shouldReduceMotion ? 1 : 1.08 }}
+          transition={{ duration: shouldReduceMotion ? 0.4 : 2.4, ease: [0.22, 1, 0.36, 1] }}
+        >
         <video
           src={coverVideoUrl}
           autoPlay
@@ -67,10 +85,11 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
           muted
           loop
           preload="auto"
-          poster="/assets/opening_poster.jpg"
+          poster={COVER_POSTER}
           onLoadedData={(e) => e.currentTarget.play().catch(() => {})}
           className="h-full w-full object-cover object-center"
         />
+        </motion.div>
         <div
           className="absolute inset-0"
           style={{
