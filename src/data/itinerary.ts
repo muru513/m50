@@ -70,10 +70,11 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     noteIcon: 'price',
     description:
       'Right on Figueretas beach in the heart of Ibiza Town, a 10-minute walk from historic Dalt Vila, with a pool on a landscaped seafront terrace — THB Los Molinos is our home base for the weekend.',
-    image: '/assets/aistudio/stay_poster.jpg',
-    video: '/assets/aistudio/stay_loop.mp4',
-    videoWide: '/assets/aistudio/stay_loop_wide.mp4',
-    imageWide: '/assets/aistudio/stay_poster_wide.jpg',
+    // THB Los Molinos film (14 s, loops seamlessly); posters are the exact first frames
+    image: '/assets/aistudio/stay_film_poster.jpg',
+    video: '/assets/aistudio/stay_film.mp4',
+    videoWide: '/assets/aistudio/stay_film_wide.mp4',
+    imageWide: '/assets/aistudio/stay_film_poster_wide.jpg',
     mood: {
       // Mediterranean olive & botanical sage, with a light veil so the sunny pool video shows through
       bg: '#16241B',
@@ -82,8 +83,8 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
       muted: '#EEF5EF',
       accent: '#CDF6D7',
       border: 'rgba(247, 250, 245, 0.2)',
-      // Lighter veil so the THB view reads clearly; extra depth only behind the date, heading and description
-      scrim: 'linear-gradient(to top, rgba(10,20,26,0.6) 0%, rgba(10,20,26,0.12) 20%, rgba(10,22,24,0.32) 40%, rgba(14,28,19,0.64) 55%, rgba(14,28,19,0.62) 86%, rgba(14,28,19,0.28) 100%)',
+      // Bright shots (sun through palms, white reception) pass behind the details, so the lower band is deeper
+      scrim: 'linear-gradient(to top, rgba(10,22,26,0.74) 0%, rgba(10,22,26,0.64) 16%, rgba(12,26,22,0.68) 34%, rgba(14,28,19,0.68) 55%, rgba(14,28,19,0.62) 86%, rgba(14,28,19,0.3) 100%)',
       // The lighter veil leaves bright sky behind the heading, so lift the text off it
       textShadow: '0 1px 2px rgba(10, 22, 14, 0.6), 0 0 16px rgba(10, 22, 14, 0.5)',
     },
