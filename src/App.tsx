@@ -14,6 +14,8 @@ interface DayVideoProps {
   src: string;
   poster: string;
   enabled: boolean;
+  /** Load the poster image (only for days on screen or about to be) */
+  showPoster: boolean;
   className: string;
   videoRef: (el: HTMLVideoElement | null) => void;
   onReady: (el: HTMLVideoElement) => void;
@@ -34,13 +36,13 @@ function useIsWideScreen(): boolean {
   return wide;
 }
 
-function DayVideo({ src, poster, enabled, className, videoRef, onReady }: DayVideoProps) {
+function DayVideo({ src, poster, enabled, showPoster, className, videoRef, onReady }: DayVideoProps) {
   const url = useVideoUrl(src, enabled);
   return (
     <video
       ref={videoRef}
       src={url}
-      poster={poster}
+      poster={showPoster ? poster : undefined}
       playsInline
       muted
       loop
@@ -133,22 +135,35 @@ export function App() {
 
   const transitionDuration = shouldReduceMotion ? 0.2 : 0.6;
 
-  // Download the visible day's video first, then its neighbours in the background
+  // Download the visible day's video first (high priority). Once it's ready, fetch every other day
+  // one at a time in the background, nearest first, so any tab is usually ready before it's tapped.
+  const backgroundStarted = useRef(false);
   useEffect(() => {
     setVideoWanted((w) => (w.includes(activeId) ? w : [...w, activeId]));
     const active = ITINERARY_SECTIONS.find((s) => s.id === activeId);
     if (!active?.video) return;
-    let cancelled = false;
-    loadVideo(videoFor(active)!).then(() => {
-      if (cancelled) return;
+    loadVideo(videoFor(active)!, 'high').then(async () => {
+      if (backgroundStarted.current) return;
+      backgroundStarted.current = true;
       const i = ITINERARY_SECTIONS.findIndex((s) => s.id === activeId);
-      const neighbours = [ITINERARY_SECTIONS[i - 1], ITINERARY_SECTIONS[i + 1]].filter(Boolean).map((s) => s.id);
-      setVideoWanted((w) => [...w, ...neighbours.filter((id) => !w.includes(id))]);
+      const order = ITINERARY_SECTIONS.map((s, j) => ({ s, d: Math.abs(j - i) }))
+        .filter(({ s }) => s.id !== activeId && s.video)
+        .sort((a, b) => a.d - b.d)
+        .map(({ s }) => s);
+      for (const s of order) {
+        await loadVideo(videoFor(s)!, 'low');
+        setVideoWanted((w) => (w.includes(s.id) ? w : [...w, s.id]));
+      }
     });
-    return () => {
-      cancelled = true;
-    };
   }, [activeId, videoFor]);
+
+  // Remember which day was on screen before the current one
+  const previousActiveRef = useRef<SectionId | null>(null);
+  const lastActiveRef = useRef<SectionId>(activeId);
+  if (lastActiveRef.current !== activeId) {
+    previousActiveRef.current = lastActiveRef.current;
+    lastActiveRef.current = activeId;
+  }
 
   // Keep the active chapter's video warm & playing immediately, and pause hidden videos once cross-dissolved
   useEffect(() => {
@@ -173,7 +188,8 @@ export function App() {
             videoRefs.current[item.id]?.pause();
           }
           delete pauseTimers.current[item.id];
-        }, 1250);
+          // Keep only the day just left decoding a while (so going back is instant); pause others sooner
+        }, item.id === previousActiveRef.current ? 6000 : 1250);
       }
     });
   }, [activeId, entered]);
@@ -250,6 +266,19 @@ export function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [entered, activeIndex, selectSection, rsvpOpen]);
+
+  // Start decoding a day's video the moment its tab is touched, a beat before the tap completes
+  const warmUp = (id: SectionId) => {
+    if (id === activeIdRef.current) return;
+    const v = videoRefs.current[id];
+    if (!v || !v.src || !v.paused) return;
+    v.play().catch(() => {});
+    if (pauseTimers.current[id]) window.clearTimeout(pauseTimers.current[id]);
+    pauseTimers.current[id] = window.setTimeout(() => {
+      if (activeIdRef.current !== id) videoRefs.current[id]?.pause();
+      delete pauseTimers.current[id];
+    }, 1500); // if the tap is abandoned, stop again
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!entered) return;
@@ -336,6 +365,7 @@ export function App() {
                     src={videoFor(item)!}
                     poster={(isWide && item.imageWide) || item.image}
                     enabled={videoWanted.includes(item.id)}
+                    showPoster={item.id === activeId || lingeringIds.includes(item.id) || videoWanted.includes(item.id)}
                     videoRef={(el) => {
                       videoRefs.current[item.id] = el;
                     }}
@@ -575,6 +605,7 @@ export function App() {
                 <button
                   key={item.id}
                   type="button"
+                  onPointerDown={() => warmUp(item.id)}
                   onClick={() => selectSection(item.id)}
                   className="relative flex flex-col items-center justify-center min-h-[44px] text-[15px] sm:text-sm font-medium tracking-wide transition-[color,transform] duration-500 active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                   style={{
