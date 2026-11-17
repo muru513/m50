@@ -44,11 +44,9 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onEnter, alreadyRe
 
   return (
     <motion.div
-      initial={
-        alreadyRevealed
-          ? { opacity: 0, scale: shouldReduceMotion ? 1 : 1.03 }
-          : { opacity: 0, scale: 1 }
-      }
+      // First load: appear fully opaque at once, so the itinerary pre-rendered underneath never shows
+      // through. Returning to the cover (Esc / M 50) still fades it in.
+      initial={alreadyRevealed ? { opacity: 0, scale: shouldReduceMotion ? 1 : 1.03 } : false}
       animate={{ opacity: 1, scale: 1 }}
       exit={{
         opacity: 0,
