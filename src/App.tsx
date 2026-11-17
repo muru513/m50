@@ -185,6 +185,20 @@ export function App() {
   const lingerTimers = useRef<Partial<Record<SectionId, number>>>({});
   const pauseTimers = useRef<Partial<Record<SectionId, number>>>({});
   const activeIdRef = useRef<SectionId>(activeId);
+  const enteredRef = useRef(entered);
+  enteredRef.current = entered;
+  // Days whose video was just started from 0:00 by a touch on their tab (so the tap doesn't restart it again)
+  const warmedFromStart = useRef<Partial<Record<SectionId, boolean>>>({});
+
+  // Every day's film starts from its beginning when you arrive on it
+  const playFromStart = (v: HTMLVideoElement) => {
+    try {
+      v.currentTime = 0;
+    } catch {
+      // not seekable yet; it starts at 0:00 anyway
+    }
+    v.play().catch(() => {});
+  };
   activeIdRef.current = activeId;
 
   const activeIndex = ITINERARY_SECTIONS.findIndex((s) => s.id === activeId);
@@ -231,6 +245,20 @@ export function App() {
       const videoEl = videoRefs.current[item.id];
       if (!videoEl) return;
 
+      if (!entered) {
+        // Behind the cover nothing plays: the active day waits on its first frame
+        if (pauseTimers.current[item.id]) window.clearTimeout(pauseTimers.current[item.id]);
+        delete pauseTimers.current[item.id];
+        videoEl.pause();
+        if (item.id === activeId && videoEl.currentTime > 0) {
+          try {
+            videoEl.currentTime = 0;
+          } catch {
+            // ignore
+          }
+        }
+        return;
+      }
       if (item.id === activeId) {
         if (pauseTimers.current[item.id]) {
           window.clearTimeout(pauseTimers.current[item.id]);
@@ -274,9 +302,18 @@ export function App() {
 
       // Immediately start decoding/playing the incoming video before paint
       const incomingVideo = videoRefs.current[nextId];
-      if (incomingVideo && incomingVideo.paused) {
-        incomingVideo.play().catch(() => {});
+      const stillVisible = lingeringIdsRef.current.includes(nextId);
+      if (incomingVideo) {
+        if (stillVisible) {
+          // Tapped back while it was still fading out: carry on rather than jump
+          if (incomingVideo.paused) incomingVideo.play().catch(() => {});
+        } else if (warmedFromStart.current[nextId]) {
+          if (incomingVideo.paused) incomingVideo.play().catch(() => {});
+        } else {
+          playFromStart(incomingVideo);
+        }
       }
+      delete warmedFromStart.current[nextId];
 
       if (lingerTimers.current[nextId]) {
         window.clearTimeout(lingerTimers.current[nextId]);
@@ -331,12 +368,14 @@ export function App() {
   const warmUp = (id: SectionId) => {
     if (id === activeIdRef.current) return;
     const v = videoRefs.current[id];
-    if (!v || !v.src || !v.paused) return;
-    v.play().catch(() => {});
+    if (!v || !v.src || lingeringIdsRef.current.includes(id)) return;
+    playFromStart(v);
+    warmedFromStart.current[id] = true;
     if (pauseTimers.current[id]) window.clearTimeout(pauseTimers.current[id]);
     pauseTimers.current[id] = window.setTimeout(() => {
       if (activeIdRef.current !== id) videoRefs.current[id]?.pause();
       delete pauseTimers.current[id];
+      delete warmedFromStart.current[id];
     }, 1500); // if the tap is abandoned, stop again
   };
 
@@ -381,9 +420,7 @@ export function App() {
             onEnter={() => {
               hasEnteredOnce.current = true;
               const currentVideo = videoRefs.current[activeIdRef.current];
-              if (currentVideo && currentVideo.paused) {
-                currentVideo.play().catch(() => {});
-              }
+              if (currentVideo) playFromStart(currentVideo);
               setEntered(true);
             }}
             alreadyRevealed={hasEnteredOnce.current}
@@ -431,8 +468,8 @@ export function App() {
                       videoRefs.current[item.id] = el;
                     }}
                     onReady={(el) => {
-                      // Start as soon as the download finishes if this day is on screen
-                      if (activeIdRef.current === item.id) el.play().catch(() => {});
+                      // Start as soon as the download finishes if this day is on screen (and past the cover)
+                      if (activeIdRef.current === item.id && enteredRef.current) el.play().catch(() => {});
                     }}
                     className={`h-full w-full object-cover ${
                       'object-center'
