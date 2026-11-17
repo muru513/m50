@@ -9,10 +9,14 @@ import { useEffect, useState } from 'react';
 
 const cache = new Map<string, Promise<string>>();
 
-export function loadVideo(src: string): Promise<string> {
+/**
+ * `priority` hints the browser: 'high' for the video on screen, 'low' for background preloads so they
+ * don't compete with it.
+ */
+export function loadVideo(src: string, priority: 'high' | 'low' | 'auto' = 'auto'): Promise<string> {
   let pending = cache.get(src);
   if (!pending) {
-    pending = fetch(src)
+    pending = fetch(src, { priority } as RequestInit)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.blob();
