@@ -38,6 +38,9 @@ export interface ItinerarySection {
   /** Optional landscape versions for wide screens (desktop, tablets held sideways) */
   videoWide?: string;
   imageWide?: string;
+  /** Optional short opening clip (same first seconds) that plays while the full video downloads */
+  videoIntro?: string;
+  videoIntroWide?: string;
   mood: {
     bg: string;
     surface: string;
@@ -74,6 +77,8 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     image: '/assets/aistudio/stay_film_poster.jpg',
     video: '/assets/aistudio/stay_film.mp4',
     videoWide: '/assets/aistudio/stay_film_wide.mp4',
+    videoIntro: '/assets/aistudio/stay_film_intro.mp4',
+    videoIntroWide: '/assets/aistudio/stay_film_intro_wide.mp4',
     imageWide: '/assets/aistudio/stay_film_poster_wide.jpg',
     mood: {
       // Mediterranean olive & botanical sage, with a light veil so the sunny pool video shows through
