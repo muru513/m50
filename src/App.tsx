@@ -12,8 +12,6 @@ const LUXURY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface DayVideoProps {
   src: string;
-  /** Short clip of the same opening seconds, shown while `src` downloads */
-  introSrc?: string;
   poster: string;
   enabled: boolean;
   /** Load the poster image (only for days on screen or about to be) */
@@ -38,71 +36,20 @@ function useIsWideScreen(): boolean {
   return wide;
 }
 
-function DayVideo({ src, introSrc, poster, enabled, showPoster, className, videoRef, onReady }: DayVideoProps) {
-  // With an intro clip: download it first and play it, then download the full video and hand over
-  // at the same moment in the film, so the day starts almost instantly.
-  const introUrl = useVideoUrl(introSrc, enabled && !!introSrc);
-  const url = useVideoUrl(src, enabled && (!introSrc || !!introUrl));
-  const introEl = useRef<HTMLVideoElement | null>(null);
-  const fullEl = useRef<HTMLVideoElement | null>(null);
-  const [handedOver, setHandedOver] = useState(!introSrc);
-  const [fading, setFading] = useState(false);
-
-  // The parent controls play/pause through whichever element is currently showing
-  useEffect(() => {
-    videoRef(handedOver || !introSrc ? fullEl.current : introEl.current);
-  });
-
-  const handOver = (full: HTMLVideoElement) => {
-    const intro = introEl.current;
-    if (!intro || handedOver) {
-      onReady(full);
-      return;
-    }
-    const wasPlaying = !intro.paused;
-    full.currentTime = Math.min(intro.currentTime + 0.05, Math.max(0, full.duration - 0.1));
-    const finish = () => {
-      setFading(true);
-      window.setTimeout(() => {
-        intro.pause();
-        setHandedOver(true);
-      }, 400);
-    };
-    if (wasPlaying) {
-      full.play().then(finish, finish);
-    } else {
-      finish();
-    }
-  };
-
+function DayVideo({ src, poster, enabled, showPoster, className, videoRef, onReady }: DayVideoProps) {
+  const url = useVideoUrl(src, enabled);
   return (
-    <>
-      <video
-        ref={fullEl}
-        src={url}
-        poster={showPoster ? poster : undefined}
-        playsInline
-        muted
-        loop
-        preload="auto"
-        onLoadedData={(e) => handOver(e.currentTarget)}
-        className={className}
-      />
-      {introSrc && !handedOver && (
-        <video
-          ref={introEl}
-          src={introUrl}
-          poster={showPoster ? poster : undefined}
-          playsInline
-          muted
-          loop
-          preload="auto"
-          onLoadedData={(e) => onReady(e.currentTarget)}
-          className={`${className} absolute inset-0 transition-opacity duration-300`}
-          style={{ opacity: fading ? 0 : 1 }}
-        />
-      )}
-    </>
+    <video
+      ref={videoRef}
+      src={url}
+      poster={showPoster ? poster : undefined}
+      playsInline
+      muted
+      loop
+      preload="auto"
+      onLoadedData={(e) => onReady(e.currentTarget)}
+      className={className}
+    />
   );
 }
 
@@ -174,10 +121,6 @@ export function App() {
     (s: (typeof ITINERARY_SECTIONS)[number]) => (isWide && s.videoWide) || s.video,
     [isWide]
   );
-  const introFor = useCallback(
-    (s: (typeof ITINERARY_SECTIONS)[number]) => (isWide && s.videoIntroWide) || s.videoIntro,
-    [isWide]
-  );
   const closeRsvp = useCallback(() => setRsvpOpen(false), []);
 
   const touchStart = useRef<{ x: number; y: number } | null>(null);
@@ -213,10 +156,7 @@ export function App() {
     setVideoWanted((w) => (w.includes(activeId) ? w : [...w, activeId]));
     const active = ITINERARY_SECTIONS.find((s) => s.id === activeId);
     if (!active?.video) return;
-    const intro = introFor(active);
-    (intro ? loadVideo(intro, 'high') : Promise.resolve(''))
-      .then(() => loadVideo(videoFor(active)!, 'high'))
-      .then(async () => {
+    loadVideo(videoFor(active)!, 'high').then(async () => {
       if (backgroundStarted.current) return;
       backgroundStarted.current = true;
       const i = ITINERARY_SECTIONS.findIndex((s) => s.id === activeId);
@@ -229,7 +169,7 @@ export function App() {
         setVideoWanted((w) => (w.includes(s.id) ? w : [...w, s.id]));
       }
     });
-  }, [activeId, videoFor, introFor]);
+  }, [activeId, videoFor]);
 
   // Remember which day was on screen before the current one
   const previousActiveRef = useRef<SectionId | null>(null);
@@ -460,7 +400,6 @@ export function App() {
                 {item.video ? (
                   <DayVideo
                     src={videoFor(item)!}
-                    introSrc={introFor(item)}
                     poster={(isWide && item.imageWide) || item.image}
                     enabled={videoWanted.includes(item.id)}
                     showPoster={item.id === activeId || lingeringIds.includes(item.id) || videoWanted.includes(item.id)}
