@@ -57,7 +57,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     id: 'stay',
     tabLabel: 'Stay',
     rsvpSummary: 'Thu 20 – Sun 23 · 280 EUR / night',
-    kicker: 'Home Base · May 20–23, 2027',
+    kicker: 'Hotel · May 20–23, 2027',
     title: 'THB Los Molinos',
     eventUrl: 'https://www.thbhotels.com/en/hotel-los-molinos-ibiza/',
     venue: 'THB Los Molinos',
@@ -69,7 +69,7 @@ export const ITINERARY_SECTIONS: ItinerarySection[] = [
     note: 'Double sea view room w/ breakfast\n280 EUR / night',
     noteIcon: 'price',
     description:
-      'Right on Figueretas beach in the heart of Ibiza Town, a 10-minute walk from historic Dalt Vila, with a pool on a landscaped seafront terrace — THB Los Molinos is our home base for the weekend.',
+      'Set on Figueretas beach in the heart of Ibiza Town with a pool on a landscaped seafront terrace, and a 10-minute walk from historic Dalt Vila — THB Los Molinos is our home base for the weekend.',
     // THB Los Molinos film (14 s, loops seamlessly); posters are the exact first frames
     image: '/assets/aistudio/stay_film_poster.jpg',
     video: '/assets/aistudio/stay_film.mp4',
