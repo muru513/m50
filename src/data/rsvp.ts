@@ -1,43 +1,40 @@
-// RSVP settings. One reply covers the whole weekend.
+// RSVP settings. One reply covers the whole weekend; replies arrive as a pre-written text message.
 
 export const RSVP_REPLY_BY = 'Jan 1';
 
-/**
- * Google Form that receives replies (they land in its linked Google Sheet).
- * Leave as null until the form exists: the RSVP still opens and thanks the guest,
- * but shows a "preview" note because nothing is saved.
- *
- * To connect: in the Google Form use ⋮ → Get pre-filled link, fill sample answers,
- * and copy the `entry.NNN` numbers from that link into `fields`. The action URL is
- * the form's URL with `/viewform` replaced by `/formResponse`.
- */
-export const RSVP_GOOGLE_FORM: null | {
-  action: string;
-  fields: { name: string; attending: string; guests: string; guestNames: string };
-} = null;
+/** Where replies are texted (E.164 format) and how the number is shown to guests */
+export const RSVP_PHONE = '+14125516177';
+export const RSVP_PHONE_DISPLAY = '(412) 551-6177';
 
 export type Attending = 'Joyfully accepts' | 'Regretfully declines';
 
 export interface RsvpReply {
   name: string;
   attending: Attending;
-  /** Party size including the person replying (0 when declining) */
-  guests: number;
-  /** Names of the other guests, comma-separated */
-  guestNames: string;
+  /** Names of the other guests in the party */
+  guestNames: string[];
 }
 
-/** Sends a reply to the Google Form. Resolves `false` when no form is connected yet. */
-export async function submitRsvp(reply: RsvpReply): Promise<boolean> {
-  if (!RSVP_GOOGLE_FORM) return false;
-  const body = new URLSearchParams({
-    [RSVP_GOOGLE_FORM.fields.name]: reply.name,
-    [RSVP_GOOGLE_FORM.fields.attending]: reply.attending,
-    [RSVP_GOOGLE_FORM.fields.guests]: String(reply.guests),
-    [RSVP_GOOGLE_FORM.fields.guestNames]: reply.guestNames,
-  });
-  // Google Forms doesn't send CORS headers, so the response can't be read; a network
-  // error still rejects, which the form reports to the guest.
-  await fetch(RSVP_GOOGLE_FORM.action, { method: 'POST', mode: 'no-cors', body });
-  return true;
+function joinNames(names: string[]): string {
+  return names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
+}
+
+/** The pre-written text the guest sends */
+export function rsvpMessage(reply: RsvpReply): string {
+  if (reply.attending === 'Regretfully declines') {
+    return `Hi! It's ${reply.name} — sadly I can't make M 50, May 20–23. Wishing you an amazing celebration ❤️`;
+  }
+  const party = [reply.name, ...reply.guestNames];
+  const partyLine = party.length > 1 ? ` Party of ${party.length}: ${joinNames(party)}.` : '';
+  return `Hi! It's ${reply.name} — joyfully accepting for M 50, May 20–23 🎉${partyLine}`;
+}
+
+/**
+ * Link that opens the Messages app with the text filled in. Apple devices expect `&body=`,
+ * Android expects `?body=`.
+ */
+export function smsLink(body?: string): string {
+  if (!body) return `sms:${RSVP_PHONE}`;
+  const apple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+  return `sms:${RSVP_PHONE}${apple ? '&' : '?'}body=${encodeURIComponent(body)}`;
 }

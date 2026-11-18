@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, Minus, Plus, X } from 'lucide-react';
 import { ITINERARY_SECTIONS } from '../data/itinerary';
-import { Attending, RSVP_GOOGLE_FORM, RSVP_REPLY_BY, submitRsvp } from '../data/rsvp';
+import { Attending, RSVP_PHONE_DISPLAY, RSVP_REPLY_BY, rsvpMessage, smsLink } from '../data/rsvp';
 
 interface RsvpSheetProps {
   onClose: () => void;
@@ -17,11 +17,6 @@ type Stage = 'form' | 'sending' | 'thanks' | 'error';
 
 const MAX_GUESTS = 4;
 
-// ['Daniel'] -> 'you and Daniel'; ['Daniel', 'Ana'] -> 'you, Daniel and Ana'
-function partyList(names: string[]): string {
-  const all = ['you', ...names];
-  return all.length === 1 ? 'you' : `${all.slice(0, -1).join(', ')} and ${all[all.length - 1]}`;
-}
 
 export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
   const shouldReduceMotion = useReducedMotion();
@@ -30,7 +25,6 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
   const [guestCount, setGuestCount] = useState(1); // including the person replying
   const [guestNames, setGuestNames] = useState<string[]>([]);
   const [stage, setStage] = useState<Stage>('form');
-  const [saved, setSaved] = useState(true);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   // Close on Escape, keep the page behind from scrolling, and move focus into the sheet
@@ -66,23 +60,16 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSend || !attending) return;
-    setStage('sending');
-    try {
-      const wasSaved = await submitRsvp({
-        name: name.trim(),
-        attending,
-        guests: accepted ? guestCount : 0,
-        guestNames: accepted ? extraNames.join(', ') : '',
-      });
-      setSaved(wasSaved);
-      setStage('thanks');
-    } catch {
-      setStage('error');
-    }
+    // Open Messages with the reply written out (must happen directly in the tap, so no awaiting first)
+    window.location.href = smsLink(
+      rsvpMessage({ name: name.trim(), attending, guestNames: accepted ? extraNames : [] })
+    );
+    setStage('thanks');
   };
+
 
   const labelClass = 'block text-[11px] tracking-[0.16em] uppercase';
   const inputClass =
@@ -137,16 +124,21 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
             </p>
             <p className="text-[13.5px] leading-relaxed mb-6" style={{ color: SAND }}>
               {accepted
-                ? `We've noted ${partyList(extraNames)} for May\u00a020–23.`
+                ? `Can't wait to celebrate with ${extraNames.length ? 'you all' : 'you'}, May\u00a020–23.`
                 : 'Thank you for letting us know.'}
-              <br />
-              Plans change? Simply reply again.
             </p>
-            {!saved && (
-              <p className="text-[12px] mb-5" style={{ color: 'rgba(247,241,229,0.5)' }}>
-                Preview — replies aren't being saved yet.
-              </p>
-            )}
+            <p className="text-[13.5px] leading-relaxed mb-5" style={{ color: '#E8DEC8' }}>
+              Your reply is ready in Messages —<br />
+              just tap <span style={{ color: '#E9C96A' }}>Send</span> to finish.
+            </p>
+            <p className="text-[12px] leading-relaxed mb-6" style={{ color: 'rgba(247,241,229,0.55)' }}>
+              Messages didn't open? Text{' '}
+              <a href={smsLink()} className="underline underline-offset-2" style={{ color: SAND }}>
+                {RSVP_PHONE_DISPLAY}
+              </a>
+              <br />
+              Plans change? Simply text again.
+            </p>
             <button
               type="button"
               onClick={onClose}
@@ -293,13 +285,11 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
               className="w-full min-h-12 rounded-full text-[12.5px] tracking-[0.24em] uppercase transition-opacity cursor-pointer disabled:cursor-default disabled:opacity-45"
               style={{ border: `1px solid ${GOLD}`, color: '#E9C96A' }}
             >
-              {stage === 'sending' ? 'Sending…' : 'Send reply'}
+              Send reply
             </button>
-            {!RSVP_GOOGLE_FORM && (
-              <p className="text-center text-[11.5px] mt-3" style={{ color: 'rgba(247,241,229,0.4)' }}>
-                Preview — replies aren't being saved yet.
-              </p>
-            )}
+            <p className="text-center text-[11.5px] mt-3" style={{ color: 'rgba(247,241,229,0.45)' }}>
+              Opens Messages with your reply written out
+            </p>
           </form>
         )}
       </motion.div>
