@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, Minus, Plus, X } from 'lucide-react';
 import { ITINERARY_SECTIONS } from '../data/itinerary';
-import { Attending, RSVP_PHONE_DISPLAY, RSVP_REPLY_BY, rsvpMessage, smsLink } from '../data/rsvp';
+import { Attending, RSVP_REPLY_BY, rsvpMessage, smsLink } from '../data/rsvp';
 
 interface RsvpSheetProps {
   onClose: () => void;
@@ -47,7 +47,6 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
   const extraNames = Array.from({ length: guestCount - 1 }, (_, i) => (guestNames[i] ?? '').trim());
   const guestsNamed = !accepted || extraNames.every((n) => n.length > 0);
   const canSend = name.trim().length > 0 && attending !== null && guestsNamed && stage !== 'sending';
-  const firstName = name.trim().split(/\s+/)[0] ?? '';
 
   const changeGuestCount = (delta: number) => {
     setGuestCount((c) => Math.min(MAX_GUESTS, Math.max(1, c + delta)));
@@ -116,29 +115,9 @@ export const RsvpSheet: React.FC<RsvpSheetProps> = ({ onClose }) => {
         {stage === 'thanks' ? (
           <div className="text-center pt-6 pb-8 px-1.5">
             <span aria-hidden="true" className="block w-12 h-px mx-auto mb-6" style={{ backgroundColor: GOLD, opacity: 0.6 }} />
-            <h2 id="rsvp-title" className="font-display font-normal text-[40px] leading-[1.1] mb-2.5" style={{ color: INK }}>
-              {accepted ? `Gracias, ${firstName}` : `Thank you, ${firstName}`}
+            <h2 id="rsvp-title" className="font-display font-normal text-[36px] leading-[1.15] mb-8" style={{ color: INK }}>
+              Thank you for your reply.
             </h2>
-            <p className="font-display italic text-[22px] mb-4" style={{ color: '#E8DEC8' }}>
-              {accepted ? 'See you in Ibiza' : "You'll be missed"}
-            </p>
-            <p className="text-[13.5px] leading-relaxed mb-6" style={{ color: SAND }}>
-              {accepted
-                ? `Can't wait to celebrate with ${extraNames.length ? 'you all' : 'you'}, May\u00a020–23.`
-                : 'Thank you for letting us know.'}
-            </p>
-            <p className="text-[13.5px] leading-relaxed mb-5" style={{ color: '#E8DEC8' }}>
-              Your reply is ready in Messages —<br />
-              just tap <span style={{ color: '#E9C96A' }}>Send</span> to finish.
-            </p>
-            <p className="text-[12px] leading-relaxed mb-6" style={{ color: 'rgba(247,241,229,0.55)' }}>
-              Messages didn't open? Text{' '}
-              <a href={smsLink()} className="underline underline-offset-2" style={{ color: SAND }}>
-                {RSVP_PHONE_DISPLAY}
-              </a>
-              <br />
-              Plans change? Simply text again.
-            </p>
             <button
               type="button"
               onClick={onClose}
